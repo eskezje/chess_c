@@ -28,8 +28,8 @@ struct Tuple_piece {
 };
 
 struct Chess_move {
-    Tuple_piece from;
-    Tuple_piece to;
+    struct Tuple_piece from;
+    struct Tuple_piece to;
 };
 
 #endif
