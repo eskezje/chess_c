@@ -22,35 +22,11 @@ struct Chess_move notation_to_sqidx(const char *chess_move)  {
 }
 
 char piece_char(int piece) {
-    char str_piece;
+    static const char pieces[] = ".pnbrqk";
 
-    if (abs(piece) == 1) {
-        str_piece = 'p';
-    }
-    else if (abs(piece) == 2) {
-        str_piece = 'n';
-    }
-    else if (abs(piece) == 3) {
-        str_piece = 'b';
-    }
-    else if (abs(piece) == 4) {
-        str_piece = 'r';
-    }
-    else if (abs(piece) == 5) {
-        str_piece = 'q';
-    }
-    else if (abs(piece) == 6) {
-        str_piece = 'k';
-    }
-    else if (piece == 0) {
-        str_piece = '.';
-    }
+    char c = pieces[abs(piece)];
 
-    if (piece > 0) {
-        return toupper(str_piece);
-    } else {
-        return str_piece;
-    }
+    return (piece > 0) ? toupper(c) : c;
 }
 
 void set_pawns() {
