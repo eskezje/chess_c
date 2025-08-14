@@ -23,7 +23,6 @@ void set_rest_white();
 void set_rest_black();
 void print_board(char show_t);
 void move_piece(void);
-struct Chess_move notation_to_sqidx(const char *chess_move);
 struct Tuple_piece {
     int idx;
     int rnk;
@@ -33,5 +32,7 @@ struct Chess_move {
     struct Tuple_piece from;
     struct Tuple_piece to;
 };
+
+struct Chess_move notation_to_sqidx(const char *chess_move);
 
 #endif
