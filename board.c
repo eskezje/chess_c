@@ -8,16 +8,15 @@ int square_index(int rank, int file) {
 
 struct Chess_move notation_to_sqidx(const char *chess_move)  {
     int file0 = tolower(chess_move[0]) - 'a';
-    int rank0 = chess_move[1] - 1;
+    int rank0 = chess_move[1] - '1';
 
     int file1 = tolower(chess_move[2]) - 'a';
-    int rank1 = chess_move[3] - 1;
+    int rank1 = chess_move[3] - '1';
 
     struct Tuple_piece from_pcs = {file0, rank0};
-
     struct Tuple_piece to_pcs = {file1, rank1};
 
-    struct Chess_move current_move = {from_pcs, chess_move};
+    struct Chess_move current_move = {from_pcs, to_pcs};
 
     return current_move;
 }
@@ -43,7 +42,7 @@ char piece_char(int piece) {
     else if (abs(piece) == 6) {
         str_piece = 'k';
     }
-    else if (abs(piece) == 0) {
+    else if (piece == 0) {
         str_piece = '.';
     }
 

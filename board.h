@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <math.h>
 
 #define EMPTY   0
 #define PAWN    1
@@ -21,7 +22,8 @@ void set_pawns();
 void set_rest_white();
 void set_rest_black();
 void print_board(char show_t);
-
+void move_piece(void);
+struct Chess_move notation_to_sqidx(const char *chess_move);
 struct Tuple_piece {
     int idx;
     int rnk;
