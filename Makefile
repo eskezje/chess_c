@@ -2,7 +2,7 @@
 TARGET = chess
 
 # Source Files
-SRC = main.c board.c
+SRC = main.c board.c pieces.c
 
 # Take every .c file in SRC and replace .c with .o.
 OBJ = $(SRC:.c=.o)
