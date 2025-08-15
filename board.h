@@ -23,9 +23,10 @@ void set_rest_white();
 void set_rest_black();
 void print_board(char show_t);
 void move_piece(void);
+void move_knight(struct Chess_move player_move);
 struct Tuple_piece {
-    int idx;
-    int rnk;
+    int file;
+    int rank;
 };
 
 struct Chess_move {
