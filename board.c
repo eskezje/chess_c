@@ -34,12 +34,10 @@ char piece_char(int piece) {
 void set_pawns() {
     for (int file = 0; file < 8; file++) {
         board[square_index(1, file)] = PAWN;
-        black_pawns[file] = square_index(1, file);
     }
 
     for (int file = 0; file < 8; file++) {
         board[square_index(6, file)] = -PAWN;
-        white_pawns[file] = square_index(6, file);
     }
 }
 
