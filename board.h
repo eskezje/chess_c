@@ -6,6 +6,8 @@
 #include <ctype.h>
 #include <math.h>
 
+#define RANK_SHIFT 16
+
 #define EMPTY   0
 #define PAWN    1
 #define KNIGHT  2
@@ -15,15 +17,8 @@
 #define KING    6
 
 extern int board[128];
+extern int current_player;
 
-int square_index(int rank, int file);
-char piece_char(int piece);
-void set_pawns();
-void set_rest_white();
-void set_rest_black();
-void print_board(char show_t);
-void move_piece(void);
-void move_knight(struct Chess_move player_move);
 struct Tuple_piece {
     int file;
     int rank;
@@ -33,6 +28,16 @@ struct Chess_move {
     struct Tuple_piece from;
     struct Tuple_piece to;
 };
+
+int square_index(int rank, int file);
+char piece_char(int piece);
+void set_pawns();
+void set_rest_white();
+void set_rest_black();
+void print_board(char show_t);
+void move_piece(void);
+int move_knight(struct Chess_move player_move);
+void advance_round(void);
 
 struct Chess_move notation_to_sqidx(const char *chess_move);
 

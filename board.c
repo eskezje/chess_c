@@ -1,9 +1,11 @@
 #include "board.h"
+#include <string.h>
 
 int board[128];
+int current_player = 1;
 
 int square_index(int rank, int file) {
-    return (16*rank + file);
+    return (RANK_SHIFT*rank + file);
 }
 
 struct Chess_move notation_to_sqidx(const char *chess_move)  {
@@ -91,62 +93,91 @@ void print_board(char show_t) {
 
 void move_piece() {
     int has_moved = 0;
-    int rank;
-    int file;
+    char chess_notation[5];
 
     while (has_moved < 1) {
-        printf("Enter the rank and the file of the piece you want to move in the notation: x, y \n");
-
-        int ok = scanf(" %d , %d", &rank, &file);
-        if (ok != 2) {
-            printf("Invalid input format. Use: x, y\n");
-            // flush the rest of the line
-            int ch; while ((ch = getchar()) != '\n' && ch != EOF) {}
-            continue;
+        printf("Enter your move in chess notation (e.g., e2e4): ");
+        scanf("%4s", chess_notation);
+        if (strcmp(chess_notation, "quit") == 0) {
+            printf("Game ended.\n");
+            exit(0);
         }
 
-        if (rank < 0 || rank > 7 || file < 0 || file > 7) {
-            printf("Out of bounds. Rank and file must be 0..7\n");
+        if (strlen(chess_notation) != 4 || 
+            chess_notation[0] < 'a' || chess_notation[0] > 'h' ||
+            chess_notation[2] < 'a' || chess_notation[2] > 'h' ||
+            chess_notation[1] < '1' || chess_notation[1] > '8' ||
+            chess_notation[3] < '1' || chess_notation[3] > '8') {
+            printf("Invalid notation. Use format: e2e4\n");
             continue;
         }
-
-        int sq = square_index(rank, file);
-        int p = board[sq];
-
+        
+        // notation to coords
+        struct Chess_move move = notation_to_sqidx(chess_notation);
+        
+        // getting source position
+        int from_file = move.from.file;
+        int from_rank = move.from.rank;
+        int from_square = square_index(from_rank, from_file);
+        
+        // Check if source coordinates are valid
+        if (from_rank < 0 || from_rank > 7 || from_file < 0 || from_file > 7) {
+            printf("Invalid source position. Try again.\n");
+            continue;
+        }
+        
+        // get piece at the source position
+        int p = board[from_square];
+        
         if (p == EMPTY) {
-            printf("No piece on rank %d, file %d\n", rank, file);
+            printf("No piece at %c%c\n", chess_notation[0], chess_notation[1]);
+            continue;
+        }
+        
+        if ((p > 0 && current_player < 0) || (p < 0 && current_player > 0)) {
+            printf("Not your piece to move!\n");
             continue;
         }
 
-        printf("You are trying to move piece %c on rank %d, and file %d\n",
-               piece_char(p), rank, file);
-
+        printf("You are trying to move piece %c from %c%c to %c%c\n",
+               piece_char(p), chess_notation[0], chess_notation[1], 
+               chess_notation[2], chess_notation[3]);
+        
+        // Call the appropriate move function based on piece type
         if (abs(p) == PAWN) {
             // pawn logic here
+            printf("Not implemented yet, try again");
+            continue;
         }
         else if (abs(p) == KNIGHT) {
-            // knight logic here
+            if (move_knight(move)) {
+                has_moved = 1;
+            }
         }
         else if (abs(p) == BISHOP) {
             // bishop logic here
+            printf("Not implemented yet, try again");
+            continue;
         }
         else if (abs(p) == ROOK) {
             // rook logic here
+            printf("Not implemented yet, try again");
+            continue;
         }
         else if (abs(p) == QUEEN) {
             // queen logic here
+            printf("Not implemented yet, try again");
+            continue;
         }
         else if (abs(p) == KING) {
             // king logic here
+            printf("Not implemented yet, try again");
+            continue;
         }
-
-        // set to 1 once a move actually succeeds
-        // has_moved = 1;
     }
 }
 
-
-void move_knight(struct Chess_move player_move) {
+int move_knight(struct Chess_move player_move) {
     // flag for found move
     int found_move = 0;
 
@@ -166,20 +197,20 @@ void move_knight(struct Chess_move player_move) {
     int knight_moves[8];
 
     //move up
-    knight_moves[0] = from_square+(2*16)-1;
-    knight_moves[1] = from_square+(2*16)+1;
+    knight_moves[0] = from_square+(2*RANK_SHIFT)-1;
+    knight_moves[1] = from_square+(2*RANK_SHIFT)+1;
     
     // move down
-    knight_moves[2] = from_square-(2*16)-1;
-    knight_moves[3] = from_square-(2*16)+1;    
+    knight_moves[2] = from_square-(2*RANK_SHIFT)-1;
+    knight_moves[3] = from_square-(2*RANK_SHIFT)+1;    
     
     // move right
-    knight_moves[4] = from_square+(1*16)+2;
-    knight_moves[5] = from_square-(1*16)+2;
+    knight_moves[4] = from_square+(1*RANK_SHIFT)+2;
+    knight_moves[5] = from_square-(1*RANK_SHIFT)+2;
     
     // move left
-    knight_moves[6] = from_square+(1*16)-2;
-    knight_moves[7] = from_square-(1*16)-2;
+    knight_moves[6] = from_square+(1*RANK_SHIFT)-2;
+    knight_moves[7] = from_square-(1*RANK_SHIFT)-2;
 
 
     for (int i = 0; i<8; i++){
@@ -187,19 +218,21 @@ void move_knight(struct Chess_move player_move) {
             board[from_square] = EMPTY;
             board[to_square] = piece;
             found_move += 1;
-            printf("The piece has been moved from %d,%d to %d, %d", from_file, from_rank, to_file, to_rank);
+            printf("The piece has been moved from %c%c to %c%c\n", 
+                'a' + from_file, '1' + from_rank, 
+                'a' + to_file, '1' + to_rank);
             advance_round();
             break;
         } 
     }
 
     if (!found_move) {
-        printf("The move was not legal try again");
-        move_piece();
+        printf("The move was not legal, try again\n");
     }
-
+    return found_move ? 1 : 0;
 }
 
-void advance_round()    {
-    //empty for now, we increase the round count, so we know that it is the other colors turn etc.
+void advance_round() {
+    current_player = -current_player;
+    printf("%s to move\n", current_player > 0 ? "White" : "Black");
 }
