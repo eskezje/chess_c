@@ -70,25 +70,37 @@ void set_rest_black() {
 }
 
 void print_board(char show_t) {
-    if (show_t == 'n')
+    printf("\n");
+    
+    if (show_t == 'n') {
+        printf("  +---+---+---+---+---+---+---+---+\n");
         for (int i = 7; i >= 0; i--) {
-            printf("%d ", (i+1));
+            printf("%d |", (i+1));
             for (int k = 0; k < 8; k++) {
-                printf("%d ", board[square_index(i, k)]);
+                printf(" %2d|", board[square_index(i, k)]);
             }
             printf("\n");
+            printf("  +---+---+---+---+---+---+---+---+\n");
         }
-    else if (show_t == 'y')
+    }
+    else if (show_t == 'y') {
+        printf("  +---+---+---+---+---+---+---+---+\n");
         for (int i = 7; i >= 0; i--) {
-            printf("%d ", (i+1));
+            printf("%d |", (i+1));
             for (int k = 0; k < 8; k++) {
-                printf("%c ", piece_char(board[square_index(i, k)]));
+                printf(" %c |", piece_char(board[square_index(i, k)]));
             }
             printf("\n");
+            printf("  +---+---+---+---+---+---+---+---+\n");
         }
-    else
+    }
+    else {
         printf("Not a valid choice, use either y or n\n");
-    printf("  a b c d e f g h\n");
+        return;
+    }
+    
+    printf("    a   b   c   d   e   f   g   h\n");
+    printf("\n");
 }
 
 void move_piece() {

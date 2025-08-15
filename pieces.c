@@ -38,6 +38,14 @@ int move_knight(struct Chess_move player_move) {
 
     for (int i = 0; i<8; i++){
         if (to_square == knight_moves[i] && !(knight_moves[i] & 0x88)) {
+            // make sure we dont go full on kamikaze
+            int target_piece = board[to_square];
+            if (target_piece != EMPTY && 
+                ((piece > 0 && target_piece > 0) || (piece < 0 && target_piece < 0))) {
+                printf("Cannot capture your own piece!\n");
+                return 0;
+            }
+            
             board[from_square] = EMPTY;
             board[to_square] = piece;
             found_move += 1;
