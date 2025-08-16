@@ -38,19 +38,13 @@ int move_knight(struct Chess_move player_move) {
 
     for (int i = 0; i<8; i++){
         if (to_square == knight_moves[i] && !(knight_moves[i] & 0x88)) {
-            // make sure we dont go full on kamikaze
-            int target_piece = board[to_square];
-            if (target_piece != EMPTY && 
-                ((piece > 0 && target_piece > 0) || (piece < 0 && target_piece < 0))) {
-                printf("Cannot capture your own piece!\n");
-                return 0;
-            }
-            
-            execute_move_piece(player_move);
-            found_move += 1;
-            advance_round();
+            found_move = execute_move_piece(player_move);
             break;
         } 
+    }
+
+    if (found_move) {
+        advance_round();
     }
 
     if (!found_move) {
@@ -58,6 +52,8 @@ int move_knight(struct Chess_move player_move) {
     }
     return found_move ? 1 : 0;
 }
+
+
 
 int move_pawn(struct Chess_move player_move) {
     // flag for found move
