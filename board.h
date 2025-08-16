@@ -40,7 +40,9 @@ void advance_round(void);
 
 int move_knight(struct Chess_move player_move);
 int move_pawn(struct Chess_move player_move);
+int move_rook(struct Chess_move player_move);
 int execute_move_piece(struct Chess_move player_move);
+int is_path_clear(struct Chess_move player_move);
 
 struct Chess_move notation_to_sqidx(const char *chess_move);
 
