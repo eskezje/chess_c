@@ -47,3 +47,6 @@
 3. Castling, en passant, pawn promotion
 4. Game state tracking
 5. Everything else
+
+maybe try and use this for ui later?
+https://www.nicbarker.com/clay
