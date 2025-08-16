@@ -110,6 +110,7 @@ void move_piece() {
     while (has_moved < 1) {
         printf("Enter your move in chess notation (e.g., e2e4): ");
         scanf("%4s", chess_notation);
+        printf("\n");
         int c; while ((c = getchar()) != '\n' && c != EOF) {}
         if (strcmp(chess_notation, "quit") == 0) {
             printf("Game ended.\n");
@@ -152,9 +153,9 @@ void move_piece() {
             continue;
         }
 
-        printf("You are trying to move piece %c from %c%c to %c%c\n",
+        /* printf("You are trying to move piece %c from %c%c to %c%c\n",
                piece_char(p), chess_notation[0], chess_notation[1], 
-               chess_notation[2], chess_notation[3]);
+               chess_notation[2], chess_notation[3]); */
         
         // Call the appropriate move function based on piece type
         if (abs(p) == PAWN) {

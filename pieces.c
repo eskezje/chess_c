@@ -50,8 +50,6 @@ int move_knight(struct Chess_move player_move) {
     return found_move ? 1 : 0;
 }
 
-
-
 int move_pawn(struct Chess_move player_move) {
     // flag for found move
     int found_move = 0;
@@ -127,17 +125,6 @@ int move_pawn(struct Chess_move player_move) {
     return found_move ? 1 : 0;
 }
 
-void print_has_move(struct Chess_move player_move)  {
-    int from_file = player_move.from.file;
-    int from_rank = player_move.from.rank;
-    
-    int to_file = player_move.to.file;
-    int to_rank = player_move.to.rank;
-    printf("The piece has been moved from %c%c to %c%c\n", 
-        'a' + from_file, '1' + from_rank, 
-        'a' + to_file, '1' + to_rank);
-}
-
 int execute_move_piece(struct Chess_move player_move) {
     // extract source position
     int from_file = player_move.from.file;
@@ -167,7 +154,17 @@ int execute_move_piece(struct Chess_move player_move) {
 
     board[to_square] = piece;
     board[from_square] = EMPTY;
-    print_has_move(player_move);
+    
+    // check for capture
+    if (target_piece != EMPTY) {
+        printf("You captured the enemies piece!\nThe piece has been moved from %c%c to %c%c\n", 
+            'a' + from_file, '1' + from_rank, 
+            'a' + to_file, '1' + to_rank);
+    } else {
+        printf("The piece has been moved from %c%c to %c%c\n", 
+            'a' + from_file, '1' + from_rank, 
+            'a' + to_file, '1' + to_rank);
+    }
 
     return 1;
 }
