@@ -46,7 +46,7 @@ int move_knight(struct Chess_move player_move) {
                 return 0;
             }
             
-            move_actual_piece(player_move);
+            execute_move_piece(player_move);
             found_move += 1;
             advance_round();
             break;
@@ -97,9 +97,7 @@ int move_pawn(struct Chess_move player_move) {
             horizontal == 0 &&              // they are not allowed to move horizontally (yet)
             abs(distance) <= move_len &&    // they cant move further than what their move length is
             board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
-                move_actual_piece(player_move);
-                found_move += 1;
-                advance_round();
+                found_move = execute_move_piece(player_move);
         }
     }
 
@@ -109,10 +107,12 @@ int move_pawn(struct Chess_move player_move) {
             horizontal == 0 &&              // they are not allowed to move horizontally (yet)
             abs(distance) <= move_len &&    // they cant move further than what their move length is
             board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
-                move_actual_piece(player_move);
-                found_move += 1;
-                advance_round();
+                found_move = execute_move_piece(player_move);
         }
+    }
+
+    if (found_move)    {
+        advance_round();
     }
 
     if (!found_move) {
@@ -133,7 +133,7 @@ void print_has_move(struct Chess_move player_move)  {
         'a' + to_file, '1' + to_rank);
 }
 
-void move_actual_piece(struct Chess_move player_move)   {
+int execute_move_piece(struct Chess_move player_move)   {
     // extract source position
     int from_file = player_move.from.file;
     int from_rank = player_move.from.rank;
@@ -146,8 +146,16 @@ void move_actual_piece(struct Chess_move player_move)   {
     
     // get the piece at the source square
     int piece = board[from_square];
+    int target_piece = board[to_square];
+    if (target_piece != EMPTY && 
+        ((piece > 0 && target_piece > 0) || (piece < 0 && target_piece < 0))) {
+             printf("Cannot capture your own piece!\n");
+            return 0;
+    }
 
     board[to_square] = piece;
     board[from_square] = EMPTY;
     print_has_move(player_move);
+
+    return 1;
 }
