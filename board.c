@@ -169,14 +169,14 @@ void move_piece() {
             }
         }
         else if (abs(p) == BISHOP) {
-            // bishop logic here
-            printf("Not implemented yet, try again");
-            continue;
+            if (move_bishop(move)) {
+                has_moved = 1;
+            }
         }
         else if (abs(p) == ROOK) {
-            // rook logic here
-            printf("Not implemented yet, try again");
-            continue;
+            if (move_rook(move)){
+                has_moved = 1;
+            }
         }
         else if (abs(p) == QUEEN) {
             // queen logic here

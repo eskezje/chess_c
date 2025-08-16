@@ -44,6 +44,58 @@ int execute_move_piece(struct Chess_move player_move) {
     return 1;
 }
 
+int is_path_clear(struct Chess_move player_move) {
+    // extract source position
+    int from_file = player_move.from.file;
+    int from_rank = player_move.from.rank;
+    int from_square = square_index(from_rank, from_file);
+    
+    // extract destination position
+    int to_file = player_move.to.file;
+    int to_rank = player_move.to.rank;
+    int to_square = square_index(to_rank, to_file);   
+    
+    int height = to_rank - from_rank;
+    int length = to_file - from_file;
+
+    // calculate step directions
+    int step_rank = 0;
+    int step_file = 0;
+    
+    if (height != 0) {
+        step_rank = (height > 0) ? RANK_SHIFT : -RANK_SHIFT;
+    }
+    
+    if (length != 0) {
+        step_file = (length > 0) ? 1 : -1;
+    }
+    
+    // calculate total step between squares
+    int step = step_rank + step_file;
+    
+    // check each square in the path (excluding destination)
+    int current_square = from_square + step;
+    
+    while (current_square != to_square) {
+        // check if we are off the board
+        if (current_square & 0x88) {
+            printf("Path goes off the board! Try again!\n");
+            return 0;
+        }
+        
+        // check if it is occupied
+        if (board[current_square] != EMPTY) {
+            printf("Path is blocked! Try again!\n");
+            return 0;
+        }
+        
+        // move to the next square
+        current_square += step;
+    }
+    
+    return 1;  // the path is clear
+}
+
 int move_knight(struct Chess_move player_move) {
     // flag for found move
     int found_move = 0;
@@ -214,7 +266,10 @@ int move_rook(struct Chess_move player_move) {
     return found_move;
 }
 
-int is_path_clear(struct Chess_move player_move) {
+int move_bishop(struct Chess_move player_move) {
+    // flag for found move
+    int found_move = 0;
+
     // extract source position
     int from_file = player_move.from.file;
     int from_rank = player_move.from.rank;
@@ -223,45 +278,30 @@ int is_path_clear(struct Chess_move player_move) {
     // extract destination position
     int to_file = player_move.to.file;
     int to_rank = player_move.to.rank;
-    int to_square = square_index(to_rank, to_file);   
-    
-    int height = to_rank - from_rank;
-    int length = to_file - from_file;
+    int to_square = square_index(to_rank, to_file);
 
-    // calculate step directions
-    int step_rank = 0;
-    int step_file = 0;
-    
-    if (height != 0) {
-        step_rank = (height > 0) ? RANK_SHIFT : -RANK_SHIFT;
+    int distance = from_rank - to_rank;
+    int horizontal = from_file - to_file;
+
+    if ((distance && !horizontal) || (!distance && horizontal))
+    {
+        printf("You can only move the Bishop diagonally, try again!");
+        return 0;
     }
-    
-    if (length != 0) {
-        step_file = (length > 0) ? 1 : -1;
+
+    if (!is_path_clear(player_move))
+    {
+        return 0;
     }
-    
-    // calculate total step between squares
-    int step = step_rank + step_file;
-    
-    // check each square in the path (excluding destination)
-    int current_square = from_square + step;
-    
-    while (current_square != to_square) {
-        // check if we are off the board
-        if (current_square & 0x88) {
-            printf("Path goes off the board! Try again!\n");
-            return 0;
-        }
-        
-        // check if it is occupied
-        if (board[current_square] != EMPTY) {
-            printf("Path is blocked! Try again!\n");
-            return 0;
-        }
-        
-        // move to the next square
-        current_square += step;
+
+    found_move = execute_move_piece(player_move);
+
+    if (found_move) {
+        advance_round();
     }
-    
-    return 1;  // the path is clear
+
+    if (!found_move) {
+        printf("The move was not legal, try again\n");
+    }
+    return found_move;
 }
