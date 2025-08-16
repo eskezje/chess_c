@@ -91,7 +91,7 @@ int move_knight(struct Chess_move player_move) {
     if (!found_move) {
         printf("The move was not legal, try again\n");
     }
-    return found_move ? 1 : 0;
+    return found_move;
 }
 
 int move_pawn(struct Chess_move player_move) {
@@ -125,6 +125,11 @@ int move_pawn(struct Chess_move player_move) {
 
     if (abs(horizontal) == 1 && abs(distance) == 1)   {
         capture = 1;
+    }
+
+    if (abs(distance) == 2 && !is_path_clear(player_move))
+    {
+        return 0;
     }
 
     //black pawn
@@ -166,7 +171,7 @@ int move_pawn(struct Chess_move player_move) {
         printf("The move was not legal, try again\n");
     }
 
-    return found_move ? 1 : 0;
+    return found_move;
 }
 
 int move_rook(struct Chess_move player_move) {
@@ -192,6 +197,13 @@ int move_rook(struct Chess_move player_move) {
         return 0;
     }
 
+    if (!is_path_clear(player_move))
+    {
+        return 0;
+    }
+
+    found_move = execute_move_piece(player_move);
+
     if (found_move) {
         advance_round();
     }
@@ -199,13 +211,10 @@ int move_rook(struct Chess_move player_move) {
     if (!found_move) {
         printf("The move was not legal, try again\n");
     }
-    return found_move ? 1 : 0;
+    return found_move;
 }
 
 int is_path_clear(struct Chess_move player_move) {
-    // flag for move being legal
-    int legal_move = 1;
-
     // extract source position
     int from_file = player_move.from.file;
     int from_rank = player_move.from.rank;
@@ -219,84 +228,40 @@ int is_path_clear(struct Chess_move player_move) {
     int height = to_rank - from_rank;
     int length = to_file - from_file;
 
-    // only horizontal
-    if (height == 0 && length)
-    {
-        if (length > 0)     // moving to the right
-        {
-            for (int i = 1; i <= length; i++)
-            {
-                if (board[from_square+i] != EMPTY)
-                {
-                    legal_move = 0;
-                    break;
-                }
-            }
-            
-        }
-        else                // moving to the left
-        {
-            for (int i = -1; i >= length; i--)
-            {
-                if (board[from_square+i])
-                {
-                    legal_move = 0;
-                    break;
-                }
-                
-            }
-            
-        }
-        
-        
-    }
-
-    // only vertial
-    else if (length == 0 && height)
-    {  
-        if (height > 0)     // means we are moving down
-        {
-            for (int i = 1; i <= length; i++)
-            {
-                if (board[from_square+(RANK_SHIFT*i)])
-                {
-                    legal_move = 0;
-                    break;
-                }
-                
-            }
-            
-        }
-        else        // means we are moving up
-        {
-            for (int i = 1; i <= length; i++)
-            {
-                if (board[from_square-(RANK_SHIFT*i)])
-                {
-                    legal_move = 0;
-                    break;
-                }
-                
-            }
-        }
-        
-    }
-
-    // diagonal check
-    else
-    {
-        if (condition)
-        {
-            /* code */
-        }
-        
+    // calculate step directions
+    int step_rank = 0;
+    int step_file = 0;
+    
+    if (height != 0) {
+        step_rank = (height > 0) ? RANK_SHIFT : -RANK_SHIFT;
     }
     
-
-    if (!legal_move)
-    {
-         printf("Path is blocked! Try again!\n");
+    if (length != 0) {
+        step_file = (length > 0) ? 1 : -1;
     }
-
-    return legal_move ? 1 : 0;
+    
+    // calculate total step between squares
+    int step = step_rank + step_file;
+    
+    // check each square in the path (excluding destination)
+    int current_square = from_square + step;
+    
+    while (current_square != to_square) {
+        // check if we are off the board
+        if (current_square & 0x88) {
+            printf("Path goes off the board! Try again!\n");
+            return 0;
+        }
+        
+        // check if it is occupied
+        if (board[current_square] != EMPTY) {
+            printf("Path is blocked! Try again!\n");
+            return 0;
+        }
+        
+        // move to the next square
+        current_square += step;
+    }
+    
+    return 1;  // the path is clear
 }
