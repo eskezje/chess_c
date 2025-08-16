@@ -36,8 +36,12 @@ void set_rest_white();
 void set_rest_black();
 void print_board(char show_t);
 void move_piece(void);
-int move_knight(struct Chess_move player_move);
 void advance_round(void);
+
+int move_knight(struct Chess_move player_move);
+int move_pawn(struct Chess_move player_move);
+void print_has_move(struct Chess_move player_move);
+void move_actual_piece(struct Chess_move player_move);
 
 struct Chess_move notation_to_sqidx(const char *chess_move);
 
