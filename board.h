@@ -29,8 +29,8 @@ struct Chess_move {
     struct Tuple_piece to;
 };
 
+char* piece_symbol(int piece);
 int square_index(int rank, int file);
-char piece_char(int piece);
 void set_pawns();
 void set_rest_white();
 void set_rest_black();

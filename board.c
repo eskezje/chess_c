@@ -23,14 +23,6 @@ struct Chess_move notation_to_sqidx(const char *chess_move)  {
     return current_move;
 }
 
-char piece_char(int piece) {
-    static const char pieces[] = ".pnbrqk";
-
-    char c = pieces[abs(piece)];
-
-    return (piece > 0) ? toupper(c) : c;
-}
-
 void set_pawns() {
     for (int file = 0; file < 8; file++) {
         board[square_index(1, file)] = PAWN;
@@ -69,6 +61,39 @@ void set_rest_black() {
     board[square_index(7, 4)] = -KING;
 }
 
+char* piece_symbol(int piece) {
+    // unicode chess symbols as strings
+    static char* white_pieces[] = {
+        " ",
+        "♟",
+        "♞",
+        "♝",
+        "♜",
+        "♛",
+        "♚" 
+    };
+    
+    static char* pieces[] = {
+        " ",
+        "♙",
+        "♘",
+        "♗",
+        "♖",
+        "♕",
+        "♔"
+    };
+    
+    int abs_piece = abs(piece);
+    
+    if (piece > 0) {
+        return white_pieces[abs_piece];
+    } else if (piece < 0) {
+        return pieces[abs_piece];
+    } else {
+        return " ";
+    }
+}
+
 void print_board(char show_t) {
     printf("\n");
     
@@ -88,7 +113,7 @@ void print_board(char show_t) {
         for (int i = 7; i >= 0; i--) {
             printf("%d |", (i+1));
             for (int k = 0; k < 8; k++) {
-                printf(" %c |", piece_char(board[square_index(i, k)]));
+                printf(" %s |", piece_symbol(board[square_index(i, k)]));
             }
             printf("\n");
             printf("  +---+---+---+---+---+---+---+---+\n");
@@ -161,12 +186,7 @@ void move_piece() {
             printf("Not your piece to move!\n");
             continue;
         }
-
-        /* printf("You are trying to move piece %c from %c%c to %c%c\n",
-               piece_char(p), chess_notation[0], chess_notation[1], 
-               chess_notation[2], chess_notation[3]); */
         
-        // Call the appropriate move function based on piece type
         if (abs(p) == PAWN) {
             if (move_pawn(move))    {
                 has_moved = 1;
