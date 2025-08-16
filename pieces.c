@@ -361,7 +361,7 @@ int move_king(struct Chess_move player_move) {
     int distance = from_rank - to_rank;
     int horizontal = from_file - to_file;
 
-    if ((abs(distance) + abs(horizontal)) > 2)  {
+    if (abs(distance) > 1 || abs(horizontal) > 1)  {
         printf("The king cant move more than 1 square in any direction! Try again\n");
         return 0;
     }
