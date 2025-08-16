@@ -325,7 +325,7 @@ int move_queen(struct Chess_move player_move) {
     int horizontal = from_file - to_file;
 
     if ((distance && horizontal) && (abs(distance) != abs(horizontal))) {
-        printf("Queen move was invalid! The Queen can only move, horizontal, vertical and diagonally! Try again!");
+        printf("Queen move was invalid! The Queen can only move horizontal, vertical and diagonally! Try again!\n");
         return 0;
     }
 

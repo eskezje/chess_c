@@ -179,9 +179,9 @@ void move_piece() {
             }
         }
         else if (abs(p) == QUEEN) {
-            // queen logic here
-            printf("Not implemented yet, try again");
-            continue;
+            if (move_queen(move)) {
+                has_moved = 1;
+            }
         }
         else if (abs(p) == KING) {
             // king logic here
