@@ -283,9 +283,49 @@ int move_bishop(struct Chess_move player_move) {
     int distance = from_rank - to_rank;
     int horizontal = from_file - to_file;
 
-    if ((distance && !horizontal) || (!distance && horizontal))
+    if (abs(distance) != abs(horizontal))
     {
         printf("You can only move the Bishop diagonally, try again!");
+        return 0;
+    }
+
+    if (!is_path_clear(player_move))
+    {
+        return 0;
+    }
+
+    found_move = execute_move_piece(player_move);
+
+    if (found_move) {
+        advance_round();
+    }
+
+    if (!found_move) {
+        printf("The move was not legal, try again\n");
+    }
+    return found_move;
+}
+
+
+int move_queen(struct Chess_move player_move) {
+    // flag for found move
+    int found_move = 0;
+
+    // extract source position
+    int from_file = player_move.from.file;
+    int from_rank = player_move.from.rank;
+    int from_square = square_index(from_rank, from_file);
+    
+    // extract destination position
+    int to_file = player_move.to.file;
+    int to_rank = player_move.to.rank;
+    int to_square = square_index(to_rank, to_file);
+
+    int distance = from_rank - to_rank;
+    int horizontal = from_file - to_file;
+
+    if ((distance && horizontal) && (abs(distance) != abs(horizontal))) {
+        printf("Queen move was invalid! The Queen can only move, horizontal, vertical and diagonally! Try again!");
         return 0;
     }
 
