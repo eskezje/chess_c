@@ -47,6 +47,8 @@ int move_king(struct Chess_move player_move);
 
 int execute_move_piece(struct Chess_move player_move);
 int is_path_clear(struct Chess_move player_move);
+int find_king(int color);
+int is_square_attacked(int sq, int by_color);
 
 struct Chess_move notation_to_sqidx(const char *chess_move);
 

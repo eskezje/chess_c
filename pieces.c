@@ -1,5 +1,84 @@
 #include "board.h"
 
+int find_king(int color) {
+    for (int sq = 0; sq < 128; ++sq) {
+        if (sq & 0x88) {
+            continue;
+        }
+        if (board[sq] == color * KING) {
+            return sq;
+        }
+    }
+    return -1;
+}
+
+int is_square_attacked(int sq, int by_color) {
+    int piece;
+
+    int pawn_offsets[2];
+    if (by_color > 0) {
+        pawn_offsets[0] = -17;
+        pawn_offsets[1] = -15;
+    } else {
+        pawn_offsets[0] = 15;
+        pawn_offsets[1] = 17;
+    }
+    for (int i = 0; i < 2; ++i) {
+        int p_sq = sq + pawn_offsets[i];
+        if (!(p_sq & 0x88) && board[p_sq] == by_color * PAWN) {
+            return 1;
+        }
+    }
+
+    int knight_offsets[8] = {33, 31, 18, 14, -14, -18, -31, -33};
+    for (int i = 0; i < 8; ++i) {
+        int n_sq = sq + knight_offsets[i];
+        if (!(n_sq & 0x88) && board[n_sq] == by_color * KNIGHT) {
+            return 1;
+        }
+    }
+
+    int rook_dirs[4] = {1, -1, RANK_SHIFT, -RANK_SHIFT};
+    for (int i = 0; i < 4; ++i) {
+        int r_sq = sq + rook_dirs[i];
+        while (!(r_sq & 0x88)) {
+            piece = board[r_sq];
+            if (piece != EMPTY) {
+                if (piece * by_color > 0 && (abs(piece) == ROOK || abs(piece) == QUEEN)) {
+                    return 1;
+                }
+                break;
+            }
+            r_sq += rook_dirs[i];
+        }
+    }
+
+    int bishop_dirs[4] = {17, -17, 15, -15};
+    for (int i = 0; i < 4; ++i) {
+        int b_sq = sq + bishop_dirs[i];
+        while (!(b_sq & 0x88)) {
+            piece = board[b_sq];
+            if (piece != EMPTY) {
+                if (piece * by_color > 0 && (abs(piece) == BISHOP || abs(piece) == QUEEN)) {
+                    return 1;
+                }
+                break;
+            }
+            b_sq += bishop_dirs[i];
+        }
+    }
+
+    int king_offsets[8] = {1, -1, RANK_SHIFT, -RANK_SHIFT, 17, -17, 15, -15};
+    for (int i = 0; i < 8; ++i) {
+        int k_sq = sq + king_offsets[i];
+        if (!(k_sq & 0x88) && board[k_sq] == by_color * KING) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 int execute_move_piece(struct Chess_move player_move) {
     // extract source position
     int from_file = player_move.from.file;
@@ -33,10 +112,18 @@ int execute_move_piece(struct Chess_move player_move) {
         return 0;
     }
 
+
     board[to_square] = piece;
     board[from_square] = EMPTY;
-    
-    // check for capture
+
+    int king_sq = find_king(current_player);
+    if (king_sq != -1 && is_square_attacked(king_sq, -current_player)) {
+        board[from_square] = piece;
+        board[to_square] = target_piece;
+        printf("You cannot leave your king in check! Try again\n");
+        return 0;
+    }
+
     if (target_piece != EMPTY) {
         printf("You captured the enemies piece!\nThe piece has been moved from %c%c to %c%c\n", 
             'a' + from_file, '1' + from_rank, 
