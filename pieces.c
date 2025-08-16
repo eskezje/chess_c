@@ -233,12 +233,10 @@ int move_rook(struct Chess_move player_move) {
     // extract source position
     int from_file = player_move.from.file;
     int from_rank = player_move.from.rank;
-    int from_square = square_index(from_rank, from_file);
     
     // extract destination position
     int to_file = player_move.to.file;
     int to_rank = player_move.to.rank;
-    int to_square = square_index(to_rank, to_file);
 
     int distance = from_rank - to_rank;
     int horizontal = from_file - to_file;
@@ -273,12 +271,10 @@ int move_bishop(struct Chess_move player_move) {
     // extract source position
     int from_file = player_move.from.file;
     int from_rank = player_move.from.rank;
-    int from_square = square_index(from_rank, from_file);
     
     // extract destination position
     int to_file = player_move.to.file;
     int to_rank = player_move.to.rank;
-    int to_square = square_index(to_rank, to_file);
 
     int distance = from_rank - to_rank;
     int horizontal = from_file - to_file;
@@ -314,12 +310,10 @@ int move_queen(struct Chess_move player_move) {
     // extract source position
     int from_file = player_move.from.file;
     int from_rank = player_move.from.rank;
-    int from_square = square_index(from_rank, from_file);
     
     // extract destination position
     int to_file = player_move.to.file;
     int to_rank = player_move.to.rank;
-    int to_square = square_index(to_rank, to_file);
 
     int distance = from_rank - to_rank;
     int horizontal = from_file - to_file;
