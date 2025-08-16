@@ -345,3 +345,40 @@ int move_queen(struct Chess_move player_move) {
     }
     return found_move;
 }
+
+int move_king(struct Chess_move player_move) {
+    // flag for found move
+    int found_move = 0;
+
+    // extract source position
+    int from_file = player_move.from.file;
+    int from_rank = player_move.from.rank;
+    
+    // extract destination position
+    int to_file = player_move.to.file;
+    int to_rank = player_move.to.rank;
+
+    int distance = from_rank - to_rank;
+    int horizontal = from_file - to_file;
+
+    if ((abs(distance) + abs(horizontal)) > 2)  {
+        printf("The king cant move more than 1 square in any direction! Try again\n");
+        return 0;
+    }
+
+    if (!is_path_clear(player_move))
+    {
+        return 0;
+    }
+
+    found_move = execute_move_piece(player_move);
+
+    if (found_move) {
+        advance_round();
+    }
+
+    if (!found_move) {
+        printf("The move was not legal, try again\n");
+    }
+    return found_move;
+}

@@ -213,9 +213,10 @@ void move_piece() {
             }
         }
         else if (abs(p) == KING) {
-            // king logic here
-            printf("Not implemented yet, try again");
-            continue;
+            if (move_king(move)){
+                has_moved = 1;
+            }
+            
         }
     }
 }
