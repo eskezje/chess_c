@@ -13,9 +13,6 @@ int move_knight(struct Chess_move player_move) {
     int to_file = player_move.to.file;
     int to_rank = player_move.to.rank;
     int to_square = square_index(to_rank, to_file);
-    
-    // get the piece at the source square
-    int piece = board[from_square];
 
     int knight_moves[8];
 
@@ -65,15 +62,11 @@ int move_pawn(struct Chess_move player_move) {
     // extract source position
     int from_file = player_move.from.file;
     int from_rank = player_move.from.rank;
-    int from_square = square_index(from_rank, from_file);
     
     // extract destination position
     int to_file = player_move.to.file;
     int to_rank = player_move.to.rank;
     int to_square = square_index(to_rank, to_file);
-    
-    // get the piece at the source square
-    int piece = board[from_square];
 
     // blank pawns
     if (from_rank == 6 && current_player < 0)    {
@@ -89,7 +82,7 @@ int move_pawn(struct Chess_move player_move) {
 
     //black pawn
     if (current_player < 0)  {
-        if (distance < 0 &&                 // they are always moving downwards on the board
+        if (distance > 0 &&                 // they are always moving downwards on the board
             horizontal == 0 &&              // they are not allowed to move horizontally (yet)
             abs(distance) <= move_len &&    // they cant move further than what their move length is
             board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
@@ -97,9 +90,9 @@ int move_pawn(struct Chess_move player_move) {
         }
     }
 
-    //black pawn
+    //white pawn
     if (current_player > 0)  {
-        if (distance > 0 &&                 // they are always moving downwards on the board
+        if (distance < 0 &&                 // they are always moving downwards on the board
             horizontal == 0 &&              // they are not allowed to move horizontally (yet)
             abs(distance) <= move_len &&    // they cant move further than what their move length is
             board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
