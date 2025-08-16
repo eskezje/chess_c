@@ -105,13 +105,22 @@ void print_board(char show_t) {
 
 void move_piece() {
     int has_moved = 0;
-    char chess_notation[5];
+    char chess_notation[16];
 
     while (has_moved < 1) {
         printf("Enter your move in chess notation (e.g., e2e4): ");
-        scanf("%4s", chess_notation);
-        printf("\n");
-        int c; while ((c = getchar()) != '\n' && c != EOF) {}
+        if (!fgets(chess_notation, sizeof(chess_notation), stdin)) {
+            printf("Error reading input.\n");
+            continue;
+        }
+        size_t len = strcspn(chess_notation, "\n");
+        if (chess_notation[len] == '\n') {
+            chess_notation[len] = '\0';
+        } else {
+            int c; while ((c = getchar()) != '\n' && c != EOF) {}
+            printf("Invalid notation. Use format: e2e4\n");
+            continue;
+        }
         if (strcmp(chess_notation, "quit") == 0) {
             printf("Game ended.\n");
             exit(0);

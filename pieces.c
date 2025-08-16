@@ -11,6 +11,12 @@ int execute_move_piece(struct Chess_move player_move) {
     int to_rank = player_move.to.rank;
     int to_square = square_index(to_rank, to_file);
     
+    // ensure the piece is actually moving
+    if (from_square == to_square) {
+        printf("You must move to a different square! Try again\n");
+        return 0;
+    }
+
     // check if destination is off the board
     if (to_square & 0x88) { 
         printf("You cannot move it to that square! Try again\n");
