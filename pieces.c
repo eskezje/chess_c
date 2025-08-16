@@ -96,14 +96,14 @@ int move_pawn(struct Chess_move player_move) {
 
         else if (capture == 1 && distance == 1 && board[to_square] > 0)
         {
-            /* code */
+            found_move = execute_move_piece(player_move);
         }
         
     }
 
     //white pawn
     if (current_player > 0)  {
-        if (distance < 0 &&                 // they are always moving downwards on the board
+        if (distance < 0 &&                 // they are always moving upwards on the board
             capture == 0 &&                 // they are not allowed to move horizontally (yet)
             abs(distance) <= move_len &&    // they cant move further than what their move length is
             board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
@@ -112,7 +112,7 @@ int move_pawn(struct Chess_move player_move) {
 
         else if (capture == 1 && distance == -1 && board[to_square] < 0)
         {
-            /* code */
+            found_move = execute_move_piece(player_move);
         }
     }
 
@@ -138,7 +138,7 @@ void print_has_move(struct Chess_move player_move)  {
         'a' + to_file, '1' + to_rank);
 }
 
-int execute_move_piece(struct Chess_move player_move)   {
+int execute_move_piece(struct Chess_move player_move) {
     // extract source position
     int from_file = player_move.from.file;
     int from_rank = player_move.from.rank;
@@ -149,13 +149,20 @@ int execute_move_piece(struct Chess_move player_move)   {
     int to_rank = player_move.to.rank;
     int to_square = square_index(to_rank, to_file);
     
+    // check if destination is off the board
+    if (to_square & 0x88) { 
+        printf("You cannot move it to that square! Try again\n");
+        return 0;
+    }
+    
     // get the piece at the source square
     int piece = board[from_square];
     int target_piece = board[to_square];
+    
     if (target_piece != EMPTY && 
         ((piece > 0 && target_piece > 0) || (piece < 0 && target_piece < 0))) {
-             printf("Cannot capture your own piece!\n");
-            return 0;
+        printf("Cannot capture your own piece!\n");
+        return 0;
     }
 
     board[to_square] = piece;
