@@ -58,6 +58,7 @@ int move_pawn(struct Chess_move player_move) {
     int move_len = 1;
     int distance = 0;
     int horizontal = 0;
+    int capture = 0;
 
     // extract source position
     int from_file = player_move.from.file;
@@ -80,23 +81,38 @@ int move_pawn(struct Chess_move player_move) {
     distance = from_rank - to_rank;
     horizontal = from_file - to_file;
 
+    if (abs(horizontal) == 1 && abs(distance) == 1)   {
+        capture = 1;
+    }
+
     //black pawn
     if (current_player < 0)  {
         if (distance > 0 &&                 // they are always moving downwards on the board
-            horizontal == 0 &&              // they are not allowed to move horizontally (yet)
+            capture == 0 &&                 // they are not allowed to move horizontally (yet)
             abs(distance) <= move_len &&    // they cant move further than what their move length is
             board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
                 found_move = execute_move_piece(player_move);
         }
+
+        else if (capture == 1 && distance == 1 && board[to_square] > 0)
+        {
+            /* code */
+        }
+        
     }
 
     //white pawn
     if (current_player > 0)  {
         if (distance < 0 &&                 // they are always moving downwards on the board
-            horizontal == 0 &&              // they are not allowed to move horizontally (yet)
+            capture == 0 &&                 // they are not allowed to move horizontally (yet)
             abs(distance) <= move_len &&    // they cant move further than what their move length is
             board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
                 found_move = execute_move_piece(player_move);
+        }
+
+        else if (capture == 1 && distance == -1 && board[to_square] < 0)
+        {
+            /* code */
         }
     }
 
