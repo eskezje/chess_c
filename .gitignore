@@ -1,4 +1,5 @@
 *.o
 chess
+tests
 .DS_Store
 \.vscode
