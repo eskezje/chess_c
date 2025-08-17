@@ -1,7 +1,7 @@
 #include "board.h"
 #include <stdio.h>
 
-int main() {
+int main(void) {
     struct GameState game = { .current_player = 1 };
 
     set_pawns(&game);

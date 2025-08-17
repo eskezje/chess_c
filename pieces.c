@@ -1,6 +1,6 @@
 #include "board.h"
 
-int find_king(struct GameState *game, int color) {
+int find_king(struct GameState *game, int8_t color) {
     for (int sq = 0; sq < 128; ++sq) {
         if (sq & 0x88) {
             continue;
@@ -12,8 +12,8 @@ int find_king(struct GameState *game, int color) {
     return -1;
 }
 
-int is_square_attacked(struct GameState *game, int sq, int by_color) {
-    int piece;
+int is_square_attacked(struct GameState *game, int sq, int8_t by_color) {
+    int8_t piece;
 
     int pawn_offsets[2];
     if (by_color > 0) {
@@ -81,13 +81,13 @@ int is_square_attacked(struct GameState *game, int sq, int by_color) {
 
 int execute_move_piece(struct GameState *game, struct Chess_move player_move) {
     // extract source position
-    int from_file = player_move.from.file;
-    int from_rank = player_move.from.rank;
+    uint8_t from_file = player_move.from.file;
+    uint8_t from_rank = player_move.from.rank;
     int from_square = square_index(from_rank, from_file);
     
     // extract destination position
-    int to_file = player_move.to.file;
-    int to_rank = player_move.to.rank;
+    uint8_t to_file = player_move.to.file;
+    uint8_t to_rank = player_move.to.rank;
     int to_square = square_index(to_rank, to_file);
     
     // ensure the piece is actually moving
@@ -103,8 +103,8 @@ int execute_move_piece(struct GameState *game, struct Chess_move player_move) {
     }
     
     // get the piece at the source square
-    int piece = game -> board[from_square];
-    int target_piece = game -> board[to_square];
+    int8_t piece = game -> board[from_square];
+    int8_t target_piece = game -> board[to_square];
     
     if (target_piece != EMPTY && 
         ((piece > 0 && target_piece > 0) || (piece < 0 && target_piece < 0))) {
@@ -139,13 +139,13 @@ int execute_move_piece(struct GameState *game, struct Chess_move player_move) {
 
 int is_path_clear(struct GameState *game, struct Chess_move player_move) {
     // extract source position
-    int from_file = player_move.from.file;
-    int from_rank = player_move.from.rank;
+    uint8_t from_file = player_move.from.file;
+    uint8_t from_rank = player_move.from.rank;
     int from_square = square_index(from_rank, from_file);
     
     // extract destination position
-    int to_file = player_move.to.file;
-    int to_rank = player_move.to.rank;
+    uint8_t to_file = player_move.to.file;
+    uint8_t to_rank = player_move.to.rank;
     int to_square = square_index(to_rank, to_file);   
     
     int height = to_rank - from_rank;

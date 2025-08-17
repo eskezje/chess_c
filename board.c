@@ -1,16 +1,16 @@
 #include "board.h"
 #include <string.h>
 
-int square_index(int rank, int file) {
+int square_index(uint8_t rank, uint8_t file) {
     return (RANK_SHIFT*rank + file);
 }
 
 struct Chess_move notation_to_sqidx(const char *chess_move)  {
-    int file0 = tolower(chess_move[0]) - 'a';
-    int rank0 = chess_move[1] - '1';
+    uint8_t file0 = tolower(chess_move[0]) - 'a';
+    uint8_t rank0 = chess_move[1] - '1';
 
-    int file1 = tolower(chess_move[2]) - 'a';
-    int rank1 = chess_move[3] - '1';
+    uint8_t file1 = tolower(chess_move[2]) - 'a';
+    uint8_t rank1 = chess_move[3] - '1';
 
     struct Tuple_piece from_pcs = {file0, rank0};
     struct Tuple_piece to_pcs = {file1, rank1};
@@ -58,7 +58,7 @@ void set_rest_black(struct GameState *game) {
     game -> board[square_index(7, 4)] = -KING;
 }
 
-char* piece_symbol(int piece) {
+char* piece_symbol(int8_t piece) {
     // unicode chess symbols as strings
     static char* white_pieces[] = {
         " ",
@@ -80,7 +80,7 @@ char* piece_symbol(int piece) {
         "♔"
     };
     
-    int abs_piece = abs(piece);
+    int8_t abs_piece = abs(piece);
     
     if (piece > 0) {
         return white_pieces[abs_piece];
@@ -161,18 +161,18 @@ void move_piece(struct GameState *game) {
         struct Chess_move move = notation_to_sqidx(chess_notation);
         
         // getting source position
-        int from_file = move.from.file;
-        int from_rank = move.from.rank;
+        uint8_t from_file = move.from.file;
+        uint8_t from_rank = move.from.rank;
         int from_square = square_index(from_rank, from_file);
         
-        // Check if source coordinates are valid
-        if (from_rank < 0 || from_rank > 7 || from_file < 0 || from_file > 7) {
+        // Check if source coordinates are valid - uint8_t is always >= 0
+        if (from_rank > 7 || from_file > 7) {
             printf("Invalid source position. Try again.\n");
             continue;
         }
         
         // get piece at the source position
-        int p = game -> board[from_square];
+        int8_t p = game -> board[from_square];
         
         if (p == EMPTY) {
             printf("No piece at %c%c\n", chess_notation[0], chess_notation[1]);

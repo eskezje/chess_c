@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
+#include <stdint.h>  // Added for fixed-width types
 
 #define RANK_SHIFT 16
 
@@ -17,13 +18,13 @@
 #define KING    6
 
 struct GameState {
-    int board[128];
-    int current_player;
+    int8_t board[128];
+    int8_t current_player;
 };
 
 struct Tuple_piece {
-    int file;
-    int rank;
+    uint8_t file;
+    uint8_t rank;
 };
 
 struct Chess_move {
@@ -31,8 +32,8 @@ struct Chess_move {
     struct Tuple_piece to;
 };
 
-char* piece_symbol(int piece);
-int square_index(int rank, int file);
+char* piece_symbol(int8_t piece);
+int square_index(uint8_t rank, uint8_t file);
 void set_pawns(struct GameState *game);
 void set_rest_white(struct GameState *game);
 void set_rest_black(struct GameState *game);
@@ -49,8 +50,8 @@ int move_king(struct GameState *game, struct Chess_move player_move);
 
 int execute_move_piece(struct GameState *game, struct Chess_move player_move);
 int is_path_clear(struct GameState *game, struct Chess_move player_move);
-int find_king(struct GameState *game, int color);
-int is_square_attacked(struct GameState *game, int sq, int by_color);
+int find_king(struct GameState *game, int8_t color);
+int is_square_attacked(struct GameState *game, int sq, int8_t by_color);
 
 struct Chess_move notation_to_sqidx(const char *chess_move);
 
