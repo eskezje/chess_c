@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
-#include <stdint.h>  // Added for fixed-width types
+#include <stdint.h>  
 
 #define RANK_SHIFT 16
 
