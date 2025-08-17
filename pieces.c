@@ -194,13 +194,13 @@ int move_knight(struct GameState *game, struct Chess_move player_move) {
     int found_move = 0;
 
     // extract source position
-    int from_file = player_move.from.file;
-    int from_rank = player_move.from.rank;
+    uint8_t from_file = player_move.from.file;
+    uint8_t from_rank = player_move.from.rank;
     int from_square = square_index(from_rank, from_file);
     
     // extract destination position
-    int to_file = player_move.to.file;
-    int to_rank = player_move.to.rank;
+    uint8_t to_file = player_move.to.file;
+    uint8_t to_rank = player_move.to.rank;
     int to_square = square_index(to_rank, to_file);
 
     int knight_moves[8];
@@ -248,12 +248,12 @@ int move_pawn(struct GameState *game, struct Chess_move player_move) {
     int capture = 0;
 
     // extract source position
-    int from_file = player_move.from.file;
-    int from_rank = player_move.from.rank;
+    uint8_t from_file = player_move.from.file;
+    uint8_t from_rank = player_move.from.rank;
     
     // extract destination position
-    int to_file = player_move.to.file;
-    int to_rank = player_move.to.rank;
+    uint8_t to_file = player_move.to.file;
+    uint8_t to_rank = player_move.to.rank;
     int to_square = square_index(to_rank, to_file);
 
     // blank pawns
@@ -324,12 +324,12 @@ int move_rook(struct GameState *game, struct Chess_move player_move) {
     int found_move = 0;
 
     // extract source position
-    int from_file = player_move.from.file;
-    int from_rank = player_move.from.rank;
+    uint8_t from_file = player_move.from.file;
+    uint8_t from_rank = player_move.from.rank;
     
     // extract destination position
-    int to_file = player_move.to.file;
-    int to_rank = player_move.to.rank;
+    uint8_t to_file = player_move.to.file;
+    uint8_t to_rank = player_move.to.rank;
 
     int distance = from_rank - to_rank;
     int horizontal = from_file - to_file;
@@ -362,12 +362,12 @@ int move_bishop(struct GameState *game, struct Chess_move player_move) {
     int found_move = 0;
 
     // extract source position
-    int from_file = player_move.from.file;
-    int from_rank = player_move.from.rank;
+    uint8_t from_file = player_move.from.file;
+    uint8_t from_rank = player_move.from.rank;
     
     // extract destination position
-    int to_file = player_move.to.file;
-    int to_rank = player_move.to.rank;
+    uint8_t to_file = player_move.to.file;
+    uint8_t to_rank = player_move.to.rank;
 
     int distance = from_rank - to_rank;
     int horizontal = from_file - to_file;
@@ -401,12 +401,12 @@ int move_queen(struct GameState *game, struct Chess_move player_move) {
     int found_move = 0;
 
     // extract source position
-    int from_file = player_move.from.file;
-    int from_rank = player_move.from.rank;
+    uint8_t from_file = player_move.from.file;
+    uint8_t from_rank = player_move.from.rank;
     
     // extract destination position
-    int to_file = player_move.to.file;
-    int to_rank = player_move.to.rank;
+    uint8_t to_file = player_move.to.file;
+    uint8_t to_rank = player_move.to.rank;
 
     int distance = from_rank - to_rank;
     int horizontal = from_file - to_file;
@@ -438,12 +438,12 @@ int move_king(struct GameState *game, struct Chess_move player_move) {
     int found_move = 0;
 
     // extract source position
-    int from_file = player_move.from.file;
-    int from_rank = player_move.from.rank;
+    uint8_t from_file = player_move.from.file;
+    uint8_t from_rank = player_move.from.rank;
     
     // extract destination position
-    int to_file = player_move.to.file;
-    int to_rank = player_move.to.rank;
+    uint8_t to_file = player_move.to.file;
+    uint8_t to_rank = player_move.to.rank;
 
     int distance = from_rank - to_rank;
     int horizontal = from_file - to_file;
