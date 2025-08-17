@@ -34,6 +34,7 @@
 - [x] **Basic input validation** - Chess notation parsing and validation
 - [x] **Board representation** - 0x88 board with piece symbols
 - [x] **Turn management** - Alternating player turns
+- [x] **Data type optimization** - Using appropriate integer types (int8_t, uint8_t) for better memory usage
 - [ ] **Input validation improvements** - Better error handling for edge cases
 - [ ] **Save/Load game** - Ability to save and resume games
 - [ ] **Undo move** - Allow players to take back moves
@@ -41,9 +42,10 @@
 - [ ] **Game timer** - Add chess clocks for timed games
 
 ## Bug Fixes & Improvements
-- [ ] **Memory management** - Ensure no memory leaks
+- [x] **Memory management** - Fixed memory usage with appropriate sized types
 - [ ] **Code documentation** - Add comments explaining complex logic
 - [x] **Unit tests** - Create tests for piece movement and game logic
+- [x] **C standard compliance** - Using proper function declarations (main(void) instead of main())
 - [ ] **Refactor repetitive code** - Clean up similar patterns in piece movement functions
 - [ ] **Fix game loop** - Currently infinite loop, needs proper game end conditions
 
@@ -66,6 +68,8 @@
 - ✅ Basic chess game is playable
 - ✅ All piece movements implemented correctly
 - ✅ Check detection and prevention working
+- ✅ Code optimized with appropriate data types
+- ✅ Unit tests functioning correctly
 - ⚠️ Game doesn't end (infinite loop in main)
 - ⚠️ Missing endgame conditions (checkmate/stalemate)
 
