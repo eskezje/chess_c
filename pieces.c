@@ -1,5 +1,38 @@
 #include "board.h"
 
+int checkmate_check(struct GameState *game, int8_t color)	{
+    int sq = find_king(game, color);
+    int8_t has_moves = 0;
+    int8_t no_attacks = is_square_attacked(game, sq, color);
+    int free_spaces = check_surrounding_free(game, sq);
+    // if there is more than 2 attackers or more then we need to find a new spot for the king 
+    // if that is not possible, then there is checkmate 
+    if (no_attacks >= 2) {
+        //future logic for checking spaces 
+        if (free_spaces <= 2) {
+            return 1;
+        } 
+    }
+    // if we only have 1 attacker then we need to see if there is any free spaces we can move to 
+    // if there is no free spaces, then we need to see if we can move a piece there
+    if (no_attacks == 1)  {
+        return 1;
+    }
+    return 0;
+}
+
+int check_surrounding_free(struct GameState *game, int sq)   {
+    int8_t free_spaces = 0;
+    int surround[8] = {1, -1, RANK_SHIFT, -RANK_SHIFT, 17, -17, 15, -15};
+    for (int i = 0; i < 8; ++i) {
+        int srnd_sq = sq + surround[i];
+        if (!(srnd_sq & 0x88) && game -> board[srnd_sq] == EMPTY) {
+            free_spaces += 1;
+        }
+    }
+    return free_spaces;
+}
+
 int find_king(struct GameState *game, int8_t color) {
     for (int sq = 0; sq < 128; ++sq) {
         if (sq & 0x88) {
@@ -14,6 +47,7 @@ int find_king(struct GameState *game, int8_t color) {
 
 int is_square_attacked(struct GameState *game, int sq, int8_t by_color) {
     int8_t piece;
+    int8_t no_attacks = 0; 
 
     int pawn_offsets[2];
     if (by_color > 0) {
@@ -26,7 +60,7 @@ int is_square_attacked(struct GameState *game, int sq, int8_t by_color) {
     for (int i = 0; i < 2; ++i) {
         int p_sq = sq + pawn_offsets[i];
         if (!(p_sq & 0x88) && game -> board[p_sq] == by_color * PAWN) {
-            return 1;
+            no_attacks += 1;
         }
     }
 
@@ -34,7 +68,7 @@ int is_square_attacked(struct GameState *game, int sq, int8_t by_color) {
     for (int i = 0; i < 8; ++i) {
         int n_sq = sq + knight_offsets[i];
         if (!(n_sq & 0x88) && game -> board[n_sq] == by_color * KNIGHT) {
-            return 1;
+            no_attacks += 1;
         }
     }
 
@@ -45,7 +79,7 @@ int is_square_attacked(struct GameState *game, int sq, int8_t by_color) {
             piece = game -> board[r_sq];
             if (piece != EMPTY) {
                 if (piece * by_color > 0 && (abs(piece) == ROOK || abs(piece) == QUEEN)) {
-                    return 1;
+                    no_attacks += 1;
                 }
                 break;
             }
@@ -60,7 +94,7 @@ int is_square_attacked(struct GameState *game, int sq, int8_t by_color) {
             piece = game -> board[b_sq];
             if (piece != EMPTY) {
                 if (piece * by_color > 0 && (abs(piece) == BISHOP || abs(piece) == QUEEN)) {
-                    return 1;
+                    no_attacks += 1;
                 }
                 break;
             }
@@ -72,11 +106,11 @@ int is_square_attacked(struct GameState *game, int sq, int8_t by_color) {
     for (int i = 0; i < 8; ++i) {
         int k_sq = sq + king_offsets[i];
         if (!(k_sq & 0x88) && game -> board[k_sq] == by_color * KING) {
-            return 1;
+            no_attacks += 1;
         }
     }
 
-    return 0;
+    return no_attacks;
 }
 
 int execute_move_piece(struct GameState *game, struct Chess_move player_move) {
@@ -117,6 +151,7 @@ int execute_move_piece(struct GameState *game, struct Chess_move player_move) {
     game -> board[from_square] = EMPTY;
 
     int king_sq = find_king(game, game -> current_player);
+
     if (king_sq != -1 && is_square_attacked(game, king_sq, -game -> current_player)) {
         game -> board[from_square] = piece;
         game -> board[to_square] = target_piece;
