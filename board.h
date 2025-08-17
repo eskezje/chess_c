@@ -16,8 +16,10 @@
 #define QUEEN   5
 #define KING    6
 
-extern int board[128];
-extern int current_player;
+struct GameState {
+    int board[128];
+    int current_player;
+};
 
 struct Tuple_piece {
     int file;
@@ -31,24 +33,24 @@ struct Chess_move {
 
 char* piece_symbol(int piece);
 int square_index(int rank, int file);
-void set_pawns();
-void set_rest_white();
-void set_rest_black();
-void print_board(char show_t);
-void move_piece(void);
-void advance_round(void);
+void set_pawns(struct GameState *game);
+void set_rest_white(struct GameState *game);
+void set_rest_black(struct GameState *game);
+void print_board(struct GameState *game, char show_t);
+void move_piece(struct GameState *game);
+void advance_round(struct GameState *game);
 
-int move_knight(struct Chess_move player_move);
-int move_pawn(struct Chess_move player_move);
-int move_rook(struct Chess_move player_move);
-int move_bishop(struct Chess_move player_move);
-int move_queen(struct Chess_move player_move);
-int move_king(struct Chess_move player_move);
+int move_knight(struct GameState *game, struct Chess_move player_move);
+int move_pawn(struct GameState *game, struct Chess_move player_move);
+int move_rook(struct GameState *game, struct Chess_move player_move);
+int move_bishop(struct GameState *game, struct Chess_move player_move);
+int move_queen(struct GameState *game, struct Chess_move player_move);
+int move_king(struct GameState *game, struct Chess_move player_move);
 
-int execute_move_piece(struct Chess_move player_move);
-int is_path_clear(struct Chess_move player_move);
-int find_king(int color);
-int is_square_attacked(int sq, int by_color);
+int execute_move_piece(struct GameState *game, struct Chess_move player_move);
+int is_path_clear(struct GameState *game, struct Chess_move player_move);
+int find_king(struct GameState *game, int color);
+int is_square_attacked(struct GameState *game, int sq, int by_color);
 
 struct Chess_move notation_to_sqidx(const char *chess_move);
 

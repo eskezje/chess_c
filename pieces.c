@@ -1,18 +1,18 @@
 #include "board.h"
 
-int find_king(int color) {
+int find_king(struct GameState *game, int color) {
     for (int sq = 0; sq < 128; ++sq) {
         if (sq & 0x88) {
             continue;
         }
-        if (board[sq] == color * KING) {
+        if (game -> board[sq] == color * KING) {
             return sq;
         }
     }
     return -1;
 }
 
-int is_square_attacked(int sq, int by_color) {
+int is_square_attacked(struct GameState *game, int sq, int by_color) {
     int piece;
 
     int pawn_offsets[2];
@@ -25,7 +25,7 @@ int is_square_attacked(int sq, int by_color) {
     }
     for (int i = 0; i < 2; ++i) {
         int p_sq = sq + pawn_offsets[i];
-        if (!(p_sq & 0x88) && board[p_sq] == by_color * PAWN) {
+        if (!(p_sq & 0x88) && game -> board[p_sq] == by_color * PAWN) {
             return 1;
         }
     }
@@ -33,7 +33,7 @@ int is_square_attacked(int sq, int by_color) {
     int knight_offsets[8] = {33, 31, 18, 14, -14, -18, -31, -33};
     for (int i = 0; i < 8; ++i) {
         int n_sq = sq + knight_offsets[i];
-        if (!(n_sq & 0x88) && board[n_sq] == by_color * KNIGHT) {
+        if (!(n_sq & 0x88) && game -> board[n_sq] == by_color * KNIGHT) {
             return 1;
         }
     }
@@ -42,7 +42,7 @@ int is_square_attacked(int sq, int by_color) {
     for (int i = 0; i < 4; ++i) {
         int r_sq = sq + rook_dirs[i];
         while (!(r_sq & 0x88)) {
-            piece = board[r_sq];
+            piece = game -> board[r_sq];
             if (piece != EMPTY) {
                 if (piece * by_color > 0 && (abs(piece) == ROOK || abs(piece) == QUEEN)) {
                     return 1;
@@ -57,7 +57,7 @@ int is_square_attacked(int sq, int by_color) {
     for (int i = 0; i < 4; ++i) {
         int b_sq = sq + bishop_dirs[i];
         while (!(b_sq & 0x88)) {
-            piece = board[b_sq];
+            piece = game -> board[b_sq];
             if (piece != EMPTY) {
                 if (piece * by_color > 0 && (abs(piece) == BISHOP || abs(piece) == QUEEN)) {
                     return 1;
@@ -71,7 +71,7 @@ int is_square_attacked(int sq, int by_color) {
     int king_offsets[8] = {1, -1, RANK_SHIFT, -RANK_SHIFT, 17, -17, 15, -15};
     for (int i = 0; i < 8; ++i) {
         int k_sq = sq + king_offsets[i];
-        if (!(k_sq & 0x88) && board[k_sq] == by_color * KING) {
+        if (!(k_sq & 0x88) && game -> board[k_sq] == by_color * KING) {
             return 1;
         }
     }
@@ -79,7 +79,7 @@ int is_square_attacked(int sq, int by_color) {
     return 0;
 }
 
-int execute_move_piece(struct Chess_move player_move) {
+int execute_move_piece(struct GameState *game, struct Chess_move player_move) {
     // extract source position
     int from_file = player_move.from.file;
     int from_rank = player_move.from.rank;
@@ -103,8 +103,8 @@ int execute_move_piece(struct Chess_move player_move) {
     }
     
     // get the piece at the source square
-    int piece = board[from_square];
-    int target_piece = board[to_square];
+    int piece = game -> board[from_square];
+    int target_piece = game -> board[to_square];
     
     if (target_piece != EMPTY && 
         ((piece > 0 && target_piece > 0) || (piece < 0 && target_piece < 0))) {
@@ -113,13 +113,13 @@ int execute_move_piece(struct Chess_move player_move) {
     }
 
 
-    board[to_square] = piece;
-    board[from_square] = EMPTY;
+    game -> board[to_square] = piece;
+    game -> board[from_square] = EMPTY;
 
-    int king_sq = find_king(current_player);
-    if (king_sq != -1 && is_square_attacked(king_sq, -current_player)) {
-        board[from_square] = piece;
-        board[to_square] = target_piece;
+    int king_sq = find_king(game, game -> current_player);
+    if (king_sq != -1 && is_square_attacked(game, king_sq, -game -> current_player)) {
+        game -> board[from_square] = piece;
+        game -> board[to_square] = target_piece;
         printf("You cannot leave your king in check! Try again\n");
         return 0;
     }
@@ -137,7 +137,7 @@ int execute_move_piece(struct Chess_move player_move) {
     return 1;
 }
 
-int is_path_clear(struct Chess_move player_move) {
+int is_path_clear(struct GameState *game, struct Chess_move player_move) {
     // extract source position
     int from_file = player_move.from.file;
     int from_rank = player_move.from.rank;
@@ -177,7 +177,7 @@ int is_path_clear(struct Chess_move player_move) {
         }
         
         // check if it is occupied
-        if (board[current_square] != EMPTY) {
+        if (game -> board[current_square] != EMPTY) {
             printf("Path is blocked! Try again!\n");
             return 0;
         }
@@ -189,7 +189,7 @@ int is_path_clear(struct Chess_move player_move) {
     return 1;  // the path is clear
 }
 
-int move_knight(struct Chess_move player_move) {
+int move_knight(struct GameState *game, struct Chess_move player_move) {
     // flag for found move
     int found_move = 0;
 
@@ -224,13 +224,13 @@ int move_knight(struct Chess_move player_move) {
 
     for (int i = 0; i<8; i++){
         if (to_square == knight_moves[i] && !(knight_moves[i] & 0x88)) {
-            found_move = execute_move_piece(player_move);
+            found_move = execute_move_piece(game, player_move);
             break;
         } 
     }
 
     if (found_move) {
-        advance_round();
+        advance_round(game);
     }
 
     if (!found_move) {
@@ -239,7 +239,7 @@ int move_knight(struct Chess_move player_move) {
     return found_move;
 }
 
-int move_pawn(struct Chess_move player_move) {
+int move_pawn(struct GameState *game, struct Chess_move player_move) {
     // flag for found move
     int found_move = 0;
     int move_len = 1;
@@ -257,11 +257,11 @@ int move_pawn(struct Chess_move player_move) {
     int to_square = square_index(to_rank, to_file);
 
     // blank pawns
-    if (from_rank == 6 && current_player < 0)    {
+    if (from_rank == 6 && game -> current_player < 0)    {
         move_len = 2;
     }
     // white pawns
-    if (from_rank == 1 && current_player > 0)    {
+    if (from_rank == 1 && game -> current_player > 0)    {
         move_len = 2;
     }
 
@@ -272,44 +272,44 @@ int move_pawn(struct Chess_move player_move) {
         capture = 1;
     }
 
-    if (abs(distance) == 2 && !is_path_clear(player_move))
+    if (abs(distance) == 2 && !is_path_clear(game, player_move))
     {
         return 0;
     }
 
     //black pawn
-    if (current_player < 0)  {
+    if (game -> current_player < 0)  {
         if (distance > 0 &&                 // they are always moving downwards on the board
             capture == 0 &&                 // they are not allowed to move horizontally (yet)
             abs(distance) <= move_len &&    // they cant move further than what their move length is
-            board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
-                found_move = execute_move_piece(player_move);
+            game -> board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
+                found_move = execute_move_piece(game, player_move);
         }
 
-        else if (capture == 1 && distance == 1 && board[to_square] > 0)
+        else if (capture == 1 && distance == 1 && game -> board[to_square] > 0)
         {
-            found_move = execute_move_piece(player_move);
+            found_move = execute_move_piece(game, player_move);
         }
         
     }
 
     //white pawn
-    if (current_player > 0)  {
+    if (game -> current_player > 0)  {
         if (distance < 0 &&                 // they are always moving upwards on the board
             capture == 0 &&                 // they are not allowed to move horizontally (yet)
             abs(distance) <= move_len &&    // they cant move further than what their move length is
-            board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
-                found_move = execute_move_piece(player_move);
+            game -> board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
+                found_move = execute_move_piece(game, player_move);
         }
 
-        else if (capture == 1 && distance == -1 && board[to_square] < 0)
+        else if (capture == 1 && distance == -1 && game -> board[to_square] < 0)
         {
-            found_move = execute_move_piece(player_move);
+            found_move = execute_move_piece(game, player_move);
         }
     }
 
     if (found_move)    {
-        advance_round();
+        advance_round(game);
     }
 
     if (!found_move) {
@@ -319,7 +319,7 @@ int move_pawn(struct Chess_move player_move) {
     return found_move;
 }
 
-int move_rook(struct Chess_move player_move) {
+int move_rook(struct GameState *game, struct Chess_move player_move) {
     // flag for found move
     int found_move = 0;
 
@@ -340,15 +340,15 @@ int move_rook(struct Chess_move player_move) {
         return 0;
     }
 
-    if (!is_path_clear(player_move))
+    if (!is_path_clear(game, player_move))
     {
         return 0;
     }
 
-    found_move = execute_move_piece(player_move);
+    found_move = execute_move_piece(game, player_move);
 
     if (found_move) {
-        advance_round();
+        advance_round(game);
     }
 
     if (!found_move) {
@@ -357,7 +357,7 @@ int move_rook(struct Chess_move player_move) {
     return found_move;
 }
 
-int move_bishop(struct Chess_move player_move) {
+int move_bishop(struct GameState *game, struct Chess_move player_move) {
     // flag for found move
     int found_move = 0;
 
@@ -378,15 +378,15 @@ int move_bishop(struct Chess_move player_move) {
         return 0;
     }
 
-    if (!is_path_clear(player_move))
+    if (!is_path_clear(game, player_move))
     {
         return 0;
     }
 
-    found_move = execute_move_piece(player_move);
+    found_move = execute_move_piece(game, player_move);
 
     if (found_move) {
-        advance_round();
+        advance_round(game);
     }
 
     if (!found_move) {
@@ -396,7 +396,7 @@ int move_bishop(struct Chess_move player_move) {
 }
 
 
-int move_queen(struct Chess_move player_move) {
+int move_queen(struct GameState *game, struct Chess_move player_move) {
     // flag for found move
     int found_move = 0;
 
@@ -416,15 +416,15 @@ int move_queen(struct Chess_move player_move) {
         return 0;
     }
 
-    if (!is_path_clear(player_move))
+    if (!is_path_clear(game, player_move))
     {
         return 0;
     }
 
-    found_move = execute_move_piece(player_move);
+    found_move = execute_move_piece(game, player_move);
 
     if (found_move) {
-        advance_round();
+        advance_round(game);
     }
 
     if (!found_move) {
@@ -433,7 +433,7 @@ int move_queen(struct Chess_move player_move) {
     return found_move;
 }
 
-int move_king(struct Chess_move player_move) {
+int move_king(struct GameState *game, struct Chess_move player_move) {
     // flag for found move
     int found_move = 0;
 
@@ -453,15 +453,15 @@ int move_king(struct Chess_move player_move) {
         return 0;
     }
 
-    if (!is_path_clear(player_move))
+    if (!is_path_clear(game, player_move))
     {
         return 0;
     }
 
-    found_move = execute_move_piece(player_move);
+    found_move = execute_move_piece(game, player_move);
 
     if (found_move) {
-        advance_round();
+        advance_round(game);
     }
 
     if (!found_move) {

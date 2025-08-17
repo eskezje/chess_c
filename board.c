@@ -1,9 +1,6 @@
 #include "board.h"
 #include <string.h>
 
-int board[128];
-int current_player = 1;
-
 int square_index(int rank, int file) {
     return (RANK_SHIFT*rank + file);
 }
@@ -23,42 +20,42 @@ struct Chess_move notation_to_sqidx(const char *chess_move)  {
     return current_move;
 }
 
-void set_pawns() {
+void set_pawns(struct GameState *game) {
     for (int file = 0; file < 8; file++) {
-        board[square_index(1, file)] = PAWN;
+        game -> board[square_index(1, file)] = PAWN;
     }
 
     for (int file = 0; file < 8; file++) {
-        board[square_index(6, file)] = -PAWN;
+        game -> board[square_index(6, file)] = -PAWN;
     }
 }
 
-void set_rest_white() {
-    board[square_index(0, 0)] = ROOK;
-    board[square_index(0, 7)] = ROOK;
+void set_rest_white(struct GameState *game) {
+    game -> board[square_index(0, 0)] = ROOK;
+    game -> board[square_index(0, 7)] = ROOK;
 
-    board[square_index(0, 1)] = KNIGHT;
-    board[square_index(0, 6)] = KNIGHT;
+    game -> board[square_index(0, 1)] = KNIGHT;
+    game -> board[square_index(0, 6)] = KNIGHT;
 
-    board[square_index(0, 2)] = BISHOP;
-    board[square_index(0, 5)] = BISHOP;
+    game -> board[square_index(0, 2)] = BISHOP;
+    game -> board[square_index(0, 5)] = BISHOP;
 
-    board[square_index(0, 3)] = QUEEN;
-    board[square_index(0, 4)] = KING;
+    game -> board[square_index(0, 3)] = QUEEN;
+    game -> board[square_index(0, 4)] = KING;
 }
 
-void set_rest_black() {
-    board[square_index(7, 0)] = -ROOK;
-    board[square_index(7, 7)] = -ROOK;
+void set_rest_black(struct GameState *game) {
+    game -> board[square_index(7, 0)] = -ROOK;
+    game -> board[square_index(7, 7)] = -ROOK;
 
-    board[square_index(7, 1)] = -KNIGHT;
-    board[square_index(7, 6)] = -KNIGHT;
+    game -> board[square_index(7, 1)] = -KNIGHT;
+    game -> board[square_index(7, 6)] = -KNIGHT;
 
-    board[square_index(7, 2)] = -BISHOP;
-    board[square_index(7, 5)] = -BISHOP;
+    game -> board[square_index(7, 2)] = -BISHOP;
+    game -> board[square_index(7, 5)] = -BISHOP;
 
-    board[square_index(7, 3)] = -QUEEN;
-    board[square_index(7, 4)] = -KING;
+    game -> board[square_index(7, 3)] = -QUEEN;
+    game -> board[square_index(7, 4)] = -KING;
 }
 
 char* piece_symbol(int piece) {
@@ -94,7 +91,7 @@ char* piece_symbol(int piece) {
     }
 }
 
-void print_board(char show_t) {
+void print_board(struct GameState *game, char show_t) {
     printf("\n");
     
     if (show_t == 'n') {
@@ -102,7 +99,7 @@ void print_board(char show_t) {
         for (int i = 7; i >= 0; i--) {
             printf("%d |", (i+1));
             for (int k = 0; k < 8; k++) {
-                printf(" %2d|", board[square_index(i, k)]);
+                printf(" %2d|", game -> board[square_index(i, k)]);
             }
             printf("\n");
             printf("  +---+---+---+---+---+---+---+---+\n");
@@ -113,7 +110,7 @@ void print_board(char show_t) {
         for (int i = 7; i >= 0; i--) {
             printf("%d |", (i+1));
             for (int k = 0; k < 8; k++) {
-                printf(" %s |", piece_symbol(board[square_index(i, k)]));
+                printf(" %s |", piece_symbol(game -> board[square_index(i, k)]));
             }
             printf("\n");
             printf("  +---+---+---+---+---+---+---+---+\n");
@@ -128,7 +125,7 @@ void print_board(char show_t) {
     printf("\n");
 }
 
-void move_piece() {
+void move_piece(struct GameState *game) {
     int has_moved = 0;
     char chess_notation[16];
 
@@ -175,45 +172,45 @@ void move_piece() {
         }
         
         // get piece at the source position
-        int p = board[from_square];
+        int p = game -> board[from_square];
         
         if (p == EMPTY) {
             printf("No piece at %c%c\n", chess_notation[0], chess_notation[1]);
             continue;
         }
         
-        if ((p > 0 && current_player < 0) || (p < 0 && current_player > 0)) {
+        if ((p > 0 && game -> current_player < 0) || (p < 0 && game -> current_player > 0)) {
             printf("Not your piece to move!\n");
             continue;
         }
         
         if (abs(p) == PAWN) {
-            if (move_pawn(move))    {
+            if (move_pawn(game, move))    {
                 has_moved = 1;
             }
         }
         else if (abs(p) == KNIGHT) {
-            if (move_knight(move)) {
+            if (move_knight(game, move)) {
                 has_moved = 1;
             }
         }
         else if (abs(p) == BISHOP) {
-            if (move_bishop(move)) {
+            if (move_bishop(game, move)) {
                 has_moved = 1;
             }
         }
         else if (abs(p) == ROOK) {
-            if (move_rook(move)){
+            if (move_rook(game, move)){
                 has_moved = 1;
             }
         }
         else if (abs(p) == QUEEN) {
-            if (move_queen(move)) {
+            if (move_queen(game, move)) {
                 has_moved = 1;
             }
         }
         else if (abs(p) == KING) {
-            if (move_king(move)){
+            if (move_king(game, move)){
                 has_moved = 1;
             }
             
@@ -221,7 +218,7 @@ void move_piece() {
     }
 }
 
-void advance_round() {
-    current_player = -current_player;
-    printf("%s to move\n", current_player > 0 ? "White" : "Black");
+void advance_round(struct GameState *game) {
+    game -> current_player = -game -> current_player;
+    printf("%s to move\n", game -> current_player > 0 ? "White" : "Black");
 }
