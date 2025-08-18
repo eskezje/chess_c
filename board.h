@@ -64,7 +64,6 @@ int is_valid_knight_move(int from_sq, int to_sq);
 int is_valid_bishop_move(int from_sq, int to_sq);
 int is_valid_rook_move(int from_sq, int to_sq);
 int is_valid_queen_move(int from_sq, int to_sq);
-int check_surrounding_free(struct GameState *game, int sq);
 int execute_move_piece(struct GameState *game, struct Chess_move player_move);
 int is_path_clear(struct GameState *game, struct Chess_move player_move);
 int find_king(struct GameState *game, int8_t color);
