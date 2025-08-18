@@ -2,11 +2,10 @@
 #include <stdint.h>
 
 int check_legal_moves(struct GameState *game, int8_t color) {
-    // current implemtntation only sees if there is one legal move
+    // current implementation only sees if there is one legal move
     // can very easily change it to count all possible moves
     // but we want to spare a bit of the resources, keep it fast
     int total_legal_moves = 0;
-    int pawn_start = 0;
     int pawn_moves[4];
     int bishop_dirs[4] = {17, -17, 15, -15};
     int knight_offsets[8] = {33, 31, 18, 14, -14, -18, -31, -33};
@@ -103,11 +102,11 @@ int stalemate_check(struct GameState *game, int8_t color) {
     if (king_sq == -1) return 0; // no king is found 
     int sq_attack = is_square_attacked(game, king_sq, -color); // the king cannt be attacked to have a stalemate 
     int king_escape = can_king_escape(game, king_sq, color); // if the king can escape then there is no stalemate_check
-    int no_legal_moves = check_legal_moves(game, color);
+    int any_legal_moves = check_legal_moves(game, color);
     // now we need to check if any other pieces of the color can move
     if (sq_attack == 0 &&
         king_escape == 0 &&
-        no_legal_moves == 0) {
+        any_legal_moves == 0) {
         return 1;   // then the king isnt attacked, it cant move and no other pieces has a legal move.
     }
     return 0;       // there was a legal move 
@@ -482,7 +481,8 @@ int is_path_clear(struct GameState *game, struct Chess_move player_move) {
         
         // check if it is occupied
         if (game -> board[current_square] != EMPTY) {
-            printf("Path is blocked! Try again!\n");
+            // this print was annoying
+            // printf("Path is blocked! Try again!\n"); 
             return 0;
         }
         
