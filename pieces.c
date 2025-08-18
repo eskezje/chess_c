@@ -35,8 +35,18 @@ int check_legal_moves(struct GameState *game, int8_t color) {
                         }
                         break;
                 case ROOK:
-                    // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
-                    break;
+                        int rook_dirs[4] = {1, -1, RANK_SHIFT, -RANK_SHIFT};
+                        for (int i = 0; i < 4; ++i) {
+                            int r_sq = sq + rook_dirs[i];
+                            while (!(r_sq & 0x88)) {
+                                if (can_piece_move_to(game, sq, r_sq, p)) {
+                                    total_legal_moves += 1;
+                                    break;
+                                }
+                                r_sq += rook_dirs[i];
+                            }
+                        }
+                        break;
                 case QUEEN:
                     // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
                     break;
