@@ -1,12 +1,12 @@
 #include "board.h"
 #include <stdint.h>
 
-
 int check_legal_moves(struct GameState *game, int8_t color) {
     // current implemtntation only sees if there is one legal move
     // can very easily change it to count all possible moves
     // but we want to spare a bit of the resources, keep it fast
     int total_legal_moves = 0;
+    int pawn_start = 0;
     for (int sq = 0; sq < 128; sq++) {
         if (sq & 0x88) continue;
         if (total_legal_moves) {
@@ -19,6 +19,33 @@ int check_legal_moves(struct GameState *game, int8_t color) {
             int abs_piece = abs(p);
             switch (abs_piece) {
                 case PAWN:
+                    int pawn_moves[4];
+                    int pawn_rank = (sq / RANK_SHIFT);      // trying to cast it to an int.
+                    if (color > 0) {    // white pawn
+                        pawn_moves[0] = -RANK_SHIFT;
+                        pawn_moves[1] = -2*RANK_SHIFT;
+                        pawn_moves[2] = -RANK_SHIFT+1;
+                        pawn_moves[3] = -RANK_SHIFT-1;
+                        pawn_start = 6;
+                    }
+                    else {              // black pawn
+                        pawn_moves[0] = RANK_SHIFT;
+                        pawn_moves[1] = 2*RANK_SHIFT;
+                        pawn_moves[2] = RANK_SHIFT+1;
+                        pawn_moves[3] = RANK_SHIFT-1;
+                        pawn_start = 1;
+                    
+                    }
+                    if ((pawn_moves[0] + sq) == EMPTY && !((pawn_moves[0] + sq ) & 0x88)) {
+                        if (can_piece_move_to(game, sq, (pawn_moves[0]+sq), p)) {
+                            total_legal_moves += 1;
+                        }
+                    }
+                    else if (pawn_start == pawn_start) {
+                        if (can_piece_move_to(game, sq, sq+pawn_moves[2], p)) {
+                            total_legal_moves += 1;    
+                        }
+                    }
                     break;
                 case BISHOP:
                     int bishop_dirs[4] = {17, -17, 15, -15};
