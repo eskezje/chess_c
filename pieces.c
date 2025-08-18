@@ -20,24 +20,30 @@ int check_legal_moves(struct GameState *game, int8_t color) {
             switch (abs_piece) {
                 case PAWN:
                     // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+                    break;
                 case BISHOP:
                     // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+                    break;
                 case KNIGHT:
                         int knight_offsets[8] = {33, 31, 18, 14, -14, -18, -31, -33};
                         for (int i = 0; i < 8; ++i) {
                             int n_sq = sq + knight_offsets[i];
                             if (!(n_sq & 0x88) && can_piece_move_to(game, sq, n_sq, p)) {
                                     total_legal_moves += 1;
+                                    break;
                                 }
                         }
+                        break;
                 case ROOK:
                     // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+                    break;
                 case QUEEN:
                     // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+                    break;
             }
         }
     }
-    
+
     return total_legal_moves;
 }
 
