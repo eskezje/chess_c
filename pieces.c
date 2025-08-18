@@ -19,10 +19,18 @@ int check_legal_moves(struct GameState *game, int8_t color) {
             int abs_piece = abs(p);
             switch (abs_piece) {
                 case PAWN:
-                    // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
                     break;
                 case BISHOP:
-                    // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+                    int bishop_dirs[4] = {17, -17, 15, -15};
+                    for (int i = 0; i < 4; ++i)    {
+                        int b_sq = sq + bishop_dirs[i];
+                        while (!(b_sq & 0x88))  {
+                            if (can_piece_move_to(game, sq, b_sq, p)) {
+                                total_legal_moves += 1;
+                                break;
+                            }
+                        }
+                    }   
                     break;
                 case KNIGHT:
                         int knight_offsets[8] = {33, 31, 18, 14, -14, -18, -31, -33};
