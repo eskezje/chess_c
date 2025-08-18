@@ -19,6 +19,11 @@ int main(void) {
             printf("Checkmate! %s wins!\n", game.current_player > 0 ? "Black" : "White");
             break;
         }
+
+        if (stalemate_check(&game, game.current_player)) {
+            printf("It's a stalemate! No one wins!");
+            break;
+        }
         
         // Check if current player is in check
         int king_sq = find_king(&game, game.current_player);

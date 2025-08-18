@@ -7,6 +7,13 @@ int check_legal_moves(struct GameState *game, int8_t color) {
     // but we want to spare a bit of the resources, keep it fast
     int total_legal_moves = 0;
     int pawn_start = 0;
+    int pawn_moves[4];
+    int bishop_dirs[4] = {17, -17, 15, -15};
+    int knight_offsets[8] = {33, 31, 18, 14, -14, -18, -31, -33};
+    int rook_dirs[4] = {1, -1, RANK_SHIFT, -RANK_SHIFT};
+    int queen_dirs[8] = {1, -1, RANK_SHIFT, -RANK_SHIFT, 17, -17, 15, -15};
+
+
     for (int sq = 0; sq < 128; sq++) {
         if (sq & 0x88) continue;
         if (total_legal_moves) {
@@ -18,37 +25,28 @@ int check_legal_moves(struct GameState *game, int8_t color) {
             // now we need to check if it can move
             int abs_piece = abs(p);
             switch (abs_piece) {
-                case PAWN:
-                    int pawn_moves[4];
-                    int pawn_rank = (sq / RANK_SHIFT);      // trying to cast it to an int.
-                    if (color > 0) {    // white pawn
-                        pawn_moves[0] = -RANK_SHIFT;
-                        pawn_moves[1] = -2*RANK_SHIFT;
-                        pawn_moves[2] = -RANK_SHIFT+1;
-                        pawn_moves[3] = -RANK_SHIFT-1;
-                        pawn_start = 6;
+            case PAWN:
+                if (color > 0) {    // white pawn
+                    pawn_moves[0] = sq - RANK_SHIFT;        // forward 1
+                    pawn_moves[1] = sq - 2*RANK_SHIFT;      // forward 2
+                    pawn_moves[2] = sq - RANK_SHIFT + 1;    // capture right
+                    pawn_moves[3] = sq - RANK_SHIFT - 1;    // capture left
+                } else {            // black pawn
+                    pawn_moves[0] = sq + RANK_SHIFT;        // forward 1
+                    pawn_moves[1] = sq + 2*RANK_SHIFT;      // forward 2
+                    pawn_moves[2] = sq + RANK_SHIFT + 1;    // capture right
+                    pawn_moves[3] = sq + RANK_SHIFT - 1;    // capture left
+                }
+                
+                for (int i = 0; i < 4; i++) {
+                    int target_sq = pawn_moves[i];
+                    if (!(target_sq & 0x88) && can_piece_move_to(game, sq, target_sq, p)) {
+                        total_legal_moves += 1;
+                        break;
                     }
-                    else {              // black pawn
-                        pawn_moves[0] = RANK_SHIFT;
-                        pawn_moves[1] = 2*RANK_SHIFT;
-                        pawn_moves[2] = RANK_SHIFT+1;
-                        pawn_moves[3] = RANK_SHIFT-1;
-                        pawn_start = 1;
-                    
-                    }
-                    if ((pawn_moves[0] + sq) == EMPTY && !((pawn_moves[0] + sq ) & 0x88)) {
-                        if (can_piece_move_to(game, sq, (pawn_moves[0]+sq), p)) {
-                            total_legal_moves += 1;
-                        }
-                    }
-                    else if (pawn_start == pawn_start) {
-                        if (can_piece_move_to(game, sq, sq+pawn_moves[2], p)) {
-                            total_legal_moves += 1;    
-                        }
-                    }
-                    break;
+                }
+                break;
                 case BISHOP:
-                    int bishop_dirs[4] = {17, -17, 15, -15};
                     for (int i = 0; i < 4; ++i)    {
                         int b_sq = sq + bishop_dirs[i];
                         while (!(b_sq & 0x88))  {
@@ -56,11 +54,11 @@ int check_legal_moves(struct GameState *game, int8_t color) {
                                 total_legal_moves += 1;
                                 break;
                             }
+                            b_sq += bishop_dirs[i];
                         }
                     }   
                     break;
                 case KNIGHT:
-                        int knight_offsets[8] = {33, 31, 18, 14, -14, -18, -31, -33};
                         for (int i = 0; i < 8; ++i) {
                             int n_sq = sq + knight_offsets[i];
                             if (!(n_sq & 0x88) && can_piece_move_to(game, sq, n_sq, p)) {
@@ -70,7 +68,6 @@ int check_legal_moves(struct GameState *game, int8_t color) {
                         }
                         break;
                 case ROOK:
-                        int rook_dirs[4] = {1, -1, RANK_SHIFT, -RANK_SHIFT};
                         for (int i = 0; i < 4; ++i) {
                             int r_sq = sq + rook_dirs[i];
                             while (!(r_sq & 0x88)) {
@@ -83,7 +80,16 @@ int check_legal_moves(struct GameState *game, int8_t color) {
                         }
                         break;
                 case QUEEN:
-                    // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+                    for (int i = 0; i < 8; ++i) {
+                        int q_sq = sq + queen_dirs[i];
+                        while (!(q_sq & 0x88)) {
+                            if (can_piece_move_to(game, sq, q_sq, p)) {
+                                total_legal_moves += 1;
+                                break;
+                            }
+                            q_sq += queen_dirs[i];
+                        }
+                    }
                     break;
             }
         }
@@ -95,7 +101,7 @@ int check_legal_moves(struct GameState *game, int8_t color) {
 int stalemate_check(struct GameState *game, int8_t color) {
     int king_sq = find_king(game, color);
     if (king_sq == -1) return 0; // no king is found 
-    int sq_attack = is_square_attacked(game, king_sq, color); // the king cannt be attacked to have a stalemate 
+    int sq_attack = is_square_attacked(game, king_sq, -color); // the king cannt be attacked to have a stalemate 
     int king_escape = can_king_escape(game, king_sq, color); // if the king can escape then there is no stalemate_check
     int no_legal_moves = check_legal_moves(game, color);
     // now we need to check if any other pieces of the color can move

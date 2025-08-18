@@ -33,4 +33,4 @@ clean:
 	rm -f $(OBJ) $(TEST_OBJ) $(TARGET) $(TEST_TARGET)
 
 
-.PHONY: all test cean
+.PHONY: all test clean
