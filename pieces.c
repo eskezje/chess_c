@@ -1,13 +1,44 @@
 #include "board.h"
 #include <stdint.h>
 
+
 int check_legal_moves(struct GameState *game, int8_t color) {
+    // current implemtntation only sees if there is one legal move
+    // can very easily change it to count all possible moves
+    // but we want to spare a bit of the resources, keep it fast
     int total_legal_moves = 0;
     for (int sq = 0; sq < 128; sq++) {
-        if (game -> board[sq]) {
-        
-        } 
+        if (sq & 0x88) continue;
+        if (total_legal_moves) {
+            break;
+        }
+        int8_t p = game -> board[sq];
+        int8_t our_piece = color_of(p);
+        if (our_piece == color) {
+            // now we need to check if it can move
+            int abs_piece = abs(p);
+            switch (abs_piece) {
+                case PAWN:
+                    // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+                case BISHOP:
+                    // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+                case KNIGHT:
+                        int knight_offsets[8] = {33, 31, 18, 14, -14, -18, -31, -33};
+                        for (int i = 0; i < 8; ++i) {
+                            int n_sq = sq + knight_offsets[i];
+                            if (!(n_sq & 0x88) && can_piece_move_to(game, sq, n_sq, p)) {
+                                    total_legal_moves += 1;
+                                }
+                        }
+                case ROOK:
+                    // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+                case QUEEN:
+                    // total_legal_moves += can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+            }
+        }
     }
+    
+    return total_legal_moves;
 }
 
 int stalemate_check(struct GameState *game, int8_t color) {

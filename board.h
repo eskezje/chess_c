@@ -32,6 +32,10 @@ struct Chess_move {
     struct Tuple_piece to;
 };
 
+static inline int8_t color_of(int8_t piece) {
+    return (piece > 0) - (piece < 0);
+}
+
 char* piece_symbol(int8_t piece);
 int square_index(uint8_t rank, uint8_t file);
 void set_pawns(struct GameState *game);
