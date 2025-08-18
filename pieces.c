@@ -289,18 +289,6 @@ int is_valid_queen_move(int from_sq, int to_sq) {
     return is_valid_rook_move(from_sq, to_sq) || is_valid_bishop_move(from_sq, to_sq);
 }
 
-int check_surrounding_free(struct GameState *game, int sq)   {
-    int8_t free_spaces = 0;
-    int surround[8] = {1, -1, RANK_SHIFT, -RANK_SHIFT, 17, -17, 15, -15};
-    for (int i = 0; i < 8; ++i) {
-        int srnd_sq = sq + surround[i];
-        if (!(srnd_sq & 0x88) && game -> board[srnd_sq] == EMPTY) {
-            free_spaces += 1;
-        }
-    }
-    return free_spaces;
-}
-
 int find_king(struct GameState *game, int8_t color) {
     for (int sq = 0; sq < 128; ++sq) {
         if (sq & 0x88) {
