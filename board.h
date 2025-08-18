@@ -48,6 +48,8 @@ int move_bishop(struct GameState *game, struct Chess_move player_move);
 int move_queen(struct GameState *game, struct Chess_move player_move);
 int move_king(struct GameState *game, struct Chess_move player_move);
 
+int check_legal_moves(struct GameState *game, int8_t color);
+int stalemate_check(struct GameState *game, int8_t color);
 int checkmate_check(struct GameState *game, int8_t color);
 int can_king_escape(struct GameState *game, int king_sq, int8_t color);
 int can_defend_king(struct GameState *game, int king_sq, int8_t color);

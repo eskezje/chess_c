@@ -1,4 +1,29 @@
 #include "board.h"
+#include <stdint.h>
+
+int check_legal_moves(struct GameState *game, int8_t color) {
+    int total_legal_moves = 0;
+    for (int sq = 0; sq < 128; sq++) {
+        if (game -> board[sq]) {
+        
+        } 
+    }
+}
+
+int stalemate_check(struct GameState *game, int8_t color) {
+    int king_sq = find_king(game, color);
+    if (king_sq == -1) return 0; // no king is found 
+    int sq_attack = is_square_attacked(game, king_sq, color); // the king cannt be attacked to have a stalemate 
+    int king_escape = can_king_escape(game, king_sq, color); // if the king can escape then there is no stalemate_check
+    int no_legal_moves = check_legal_moves(game, color);
+    // now we need to check if any other pieces of the color can move
+    if (sq_attack == 0 &&
+        king_escape == 0 &&
+        no_legal_moves == 0) {
+        return 1;   // then the king isnt attacked, it cant move and no other pieces has a legal move.
+    }
+    return 0;       // there was a legal move 
+}
 
 int checkmate_check(struct GameState *game, int8_t color) {
     int king_sq = find_king(game, color);
