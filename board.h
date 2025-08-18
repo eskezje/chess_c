@@ -49,6 +49,15 @@ int move_queen(struct GameState *game, struct Chess_move player_move);
 int move_king(struct GameState *game, struct Chess_move player_move);
 
 int checkmate_check(struct GameState *game, int8_t color);
+int can_king_escape(struct GameState *game, int king_sq, int8_t color);
+int can_defend_king(struct GameState *game, int king_sq, int8_t color);
+int can_piece_defend_square(struct GameState *game, int target_sq, int king_sq, int8_t color);
+int can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece);
+int is_valid_pawn_move(struct GameState *game, struct Chess_move move, int8_t piece);
+int is_valid_knight_move(int from_sq, int to_sq);
+int is_valid_bishop_move(int from_sq, int to_sq);
+int is_valid_rook_move(int from_sq, int to_sq);
+int is_valid_queen_move(int from_sq, int to_sq);
 int check_surrounding_free(struct GameState *game, int sq);
 int execute_move_piece(struct GameState *game, struct Chess_move player_move);
 int is_path_clear(struct GameState *game, struct Chess_move player_move);

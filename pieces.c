@@ -1,24 +1,180 @@
 #include "board.h"
 
-int checkmate_check(struct GameState *game, int8_t color)	{
-    int sq = find_king(game, color);
-    int8_t has_moves = 0;
-    int8_t no_attacks = is_square_attacked(game, sq, color);
-    int free_spaces = check_surrounding_free(game, sq);
-    // if there is more than 2 attackers or more then we need to find a new spot for the king 
-    // if that is not possible, then there is checkmate 
-    if (no_attacks >= 2) {
-        //future logic for checking spaces 
-        if (free_spaces <= 2) {
-            return 1;
-        } 
+int checkmate_check(struct GameState *game, int8_t color) {
+    int king_sq = find_king(game, color);
+    if (king_sq == -1) return 0; // no king is found
+    
+    // first check if king is actually in check
+    if (!is_square_attacked(game, king_sq, -color)) {
+        return 0; // the king is not in check, so not checkmate
     }
-    // if we only have 1 attacker then we need to see if there is any free spaces we can move to 
-    // if there is no free spaces, then we need to see if we can move a piece there
-    if (no_attacks == 1)  {
-        return 1;
+    
+    // check if king can move to safety
+    if (can_king_escape(game, king_sq, color)) {
+        return 0; // the king can escape
+    }
+    
+    // check if any piece can block or capture the attacker
+    if (can_defend_king(game, king_sq, color)) {
+        return 0; // can defend
+    }
+    
+    return 1; // CHECKMATE
+}
+
+int can_king_escape(struct GameState *game, int king_sq, int8_t color) {
+    int king_moves[8] = {1, -1, RANK_SHIFT, -RANK_SHIFT, 17, -17, 15, -15};
+    
+    for (int i = 0; i < 8; i++) {
+        int escape_sq = king_sq + king_moves[i];
+        
+        if (escape_sq & 0x88) continue;
+        
+        // check if square is empty or contains enemy piece
+        int8_t target = game->board[escape_sq];
+        if (target != EMPTY && target * color > 0) continue; // own piece
+        
+        // temp make the move to test if king would still be in check
+        int8_t original_piece = game->board[escape_sq];
+        game->board[escape_sq] = color * KING;
+        game->board[king_sq] = EMPTY;
+        
+        int still_attacked = is_square_attacked(game, escape_sq, -color);
+        
+        // restore board
+        game->board[king_sq] = color * KING;
+        game->board[escape_sq] = original_piece;
+        
+        if (!still_attacked) {
+            return 1; // found escape square
+        }
+    }
+    return 0; // no escapes
+}
+
+int can_defend_king(struct GameState *game, int king_sq, int8_t color) {
+    // for each square on the board check if any of our pieces can move there
+    // to either block the attack or capture the attacker
+    for (int sq = 0; sq < 128; sq++) {
+        if (sq & 0x88) continue;
+        
+        // check if moving a piece to this square would help
+        if (can_piece_defend_square(game, sq, king_sq, color)) {
+            return 1; // we can defend the square
+        }
+    }
+    return 0; // we cannot defend the square
+}
+
+int can_piece_defend_square(struct GameState *game, int target_sq, int king_sq, int8_t color) {
+    // check if any of our pieces can move to the target square to defend the king
+    for (int from_sq = 0; from_sq < 128; from_sq++) {
+        if (from_sq & 0x88) continue;
+        
+        int8_t piece = game->board[from_sq];
+        if (piece == EMPTY || piece * color <= 0 || abs(piece) == KING) continue;
+        
+        // check if this piece can legally move to the target square
+        if (can_piece_move_to(game, from_sq, target_sq, piece)) {
+            // temp make the move and check if king is still in check
+            int8_t original_target = game->board[target_sq];
+            game->board[target_sq] = piece;
+            game->board[from_sq] = EMPTY;
+            
+            int king_still_attacked = is_square_attacked(game, king_sq, -color);
+            
+            // restore board
+            game->board[from_sq] = piece;
+            game->board[target_sq] = original_target;
+            
+            if (!king_still_attacked) {
+                return 1; // WE SAVE THE KING
+            }
+        }
     }
     return 0;
+}
+
+int can_piece_move_to(struct GameState *game, int from_sq, int to_sq, int8_t piece) {
+    // check if piece can legally move from from_sq to to_sq
+    int8_t target = game->board[to_sq];
+    
+    // we cant capture our own pieces
+    if (target != EMPTY && target * piece > 0) return 0;
+    
+    int abs_piece = abs(piece);
+    int from_rank = from_sq / RANK_SHIFT;
+    int from_file = from_sq % RANK_SHIFT;
+    int to_rank = to_sq / RANK_SHIFT;
+    int to_file = to_sq % RANK_SHIFT;
+    
+    struct Chess_move test_move = {{from_file, from_rank}, {to_file, to_rank}};
+    
+    switch (abs_piece) {
+        case PAWN:
+            return is_valid_pawn_move(game, test_move, piece);
+        case KNIGHT:
+            return is_valid_knight_move(from_sq, to_sq);
+        case BISHOP:
+            return is_valid_bishop_move(from_sq, to_sq) && is_path_clear(game, test_move);
+        case ROOK:
+            return is_valid_rook_move(from_sq, to_sq) && is_path_clear(game, test_move);
+        case QUEEN:
+            return is_valid_queen_move(from_sq, to_sq) && is_path_clear(game, test_move);
+    }
+    return 0;
+}
+
+int is_valid_pawn_move(struct GameState *game, struct Chess_move move, int8_t piece) {
+    int from_rank = move.from.rank;
+    int to_rank = move.to.rank;
+    int from_file = move.from.file;
+    int to_file = move.to.file;
+    int to_sq = square_index(to_rank, to_file);
+    
+    int distance = from_rank - to_rank;
+    int horizontal = abs(from_file - to_file);
+    
+    if (piece > 0) { // white pawn
+        if (distance < 0 && horizontal == 0 && game->board[to_sq] == EMPTY) {
+            return (abs(distance) == 1) || (from_rank == 1 && abs(distance) == 2);
+        }
+        if (distance == -1 && horizontal == 1 && game->board[to_sq] < 0) {
+            return 1; // capture
+        }
+    } else { // black pawn
+        if (distance > 0 && horizontal == 0 && game->board[to_sq] == EMPTY) {
+            return (abs(distance) == 1) || (from_rank == 6 && abs(distance) == 2);
+        }
+        if (distance == 1 && horizontal == 1 && game->board[to_sq] > 0) {
+            return 1; // capture
+        }
+    }
+    return 0;
+}
+
+int is_valid_knight_move(int from_sq, int to_sq) {
+    int knight_moves[8] = {33, 31, 18, 14, -14, -18, -31, -33};
+    for (int i = 0; i < 8; i++) {
+        if (from_sq + knight_moves[i] == to_sq) {
+            return !(to_sq & 0x88);
+        }
+    }
+    return 0;
+}
+
+int is_valid_bishop_move(int from_sq, int to_sq) {
+    int diff = to_sq - from_sq;
+    return (abs(diff) % 17 == 0 || abs(diff) % 15 == 0);
+}
+
+int is_valid_rook_move(int from_sq, int to_sq) {
+    int diff = to_sq - from_sq;
+    return (diff % RANK_SHIFT == 0 || abs(diff) < RANK_SHIFT);
+}
+
+int is_valid_queen_move(int from_sq, int to_sq) {
+    return is_valid_rook_move(from_sq, to_sq) || is_valid_bishop_move(from_sq, to_sq);
 }
 
 int check_surrounding_free(struct GameState *game, int sq)   {

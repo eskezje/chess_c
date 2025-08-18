@@ -4,7 +4,7 @@
 ## Critical Features (Required for proper chess)
 - [x] **Check Detection** - Detect when a king is under attack
 - [x] **Prevent illegal moves that leave king in check** - Players cannot make moves that put/leave their own king in check
-- [ ] **Checkmate Detection** - Game should end when king is in check and has no legal moves
+- [x] **Checkmate Detection** - Game should end when king is in check and has no legal moves
 - [ ] **Stalemate Detection** - Game should end in draw when player has no legal moves but king is not in check
 
 ## Important Chess Rules
@@ -47,7 +47,7 @@
 - [x] **Unit tests** - Create tests for piece movement and game logic
 - [x] **C standard compliance** - Using proper function declarations (main(void) instead of main())
 - [ ] **Refactor repetitive code** - Clean up similar patterns in piece movement functions
-- [ ] **Fix game loop** - Currently infinite loop, needs proper game end conditions
+- [x] **Fix game loop** - Game now properly ends on checkmate
 
 ## Nice to Have
 - [ ] **AI opponent** - Simple computer player
@@ -59,19 +59,22 @@
 ---
 **Priority Order:**
 1. ~~Check detection (most critical)~~ ✅ COMPLETED
-2. Checkmate/Stalemate detection ⬅️ **NEXT PRIORITY**
-3. Castling, en passant, pawn promotion
-4. Game state tracking
-5. Everything else
+2. ~~Checkmate detection~~ ✅ COMPLETED
+3. Stalemate detection ⬅️ **NEXT PRIORITY**
+4. Castling, en passant, pawn promotion
+5. Game state tracking
+6. Everything else
 
 ## Current Status:
 - ✅ Basic chess game is playable
 - ✅ All piece movements implemented correctly
 - ✅ Check detection and prevention working
+- ✅ Checkmate detection implemented and working
+- ✅ Game properly ends on checkmate
 - ✅ Code optimized with appropriate data types
 - ✅ Unit tests functioning correctly
-- ⚠️ Game doesn't end (infinite loop in main)
-- ⚠️ Missing endgame conditions (checkmate/stalemate)
+- ⚠️ Missing stalemate detection (next critical feature)
+- ⚠️ Missing special moves (castling, en passant, pawn promotion)
 
 maybe try and use this for ui later?
 https://www.nicbarker.com/clay
