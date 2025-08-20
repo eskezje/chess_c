@@ -1,5 +1,6 @@
 #include "board.h"
 #include <stdint.h>
+#include <stdlib.h>
 
 int check_legal_moves(struct GameState *game, int8_t color) {
     // current implementation only sees if there is one legal move
@@ -576,11 +577,25 @@ int move_pawn(struct GameState *game, struct Chess_move player_move) {
             abs(distance) <= move_len &&    // they cant move further than what their move length is
             game -> board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
                 found_move = execute_move_piece(game, player_move);
+                
+                // check for promotion
+                if (found_move && to_rank == 0) {
+                    int8_t promotion_piece = get_promotion_choice();
+                    game->board[to_square] = -promotion_piece; // apply negative for black
+                    printf("Pawn promoted to %s\n", piece_symbol(game->board[to_square]));
+                }
         }
 
         else if (capture == 1 && distance == 1 && game -> board[to_square] > 0)
         {
             found_move = execute_move_piece(game, player_move);
+            
+            // check for promotion
+            if (found_move && to_rank == 0) {
+                int8_t promotion_piece = get_promotion_choice();
+                game->board[to_square] = -promotion_piece; // Apply negative for black
+                printf("Pawn promoted to %s\n", piece_symbol(game->board[to_square]));
+            }
         }
         
     }
@@ -592,11 +607,25 @@ int move_pawn(struct GameState *game, struct Chess_move player_move) {
             abs(distance) <= move_len &&    // they cant move further than what their move length is
             game -> board[to_square] == EMPTY)   {  // the square they are moving to needs to be empty, if moving only vertically
                 found_move = execute_move_piece(game, player_move);
+                
+                // check for promotion
+                if (found_move && to_rank == 7) {
+                    int8_t promotion_piece = get_promotion_choice();
+                    game->board[to_square] = promotion_piece; // Positive for white
+                    printf("Pawn promoted to %s\n", piece_symbol(game->board[to_square]));
+                }
         }
 
         else if (capture == 1 && distance == -1 && game -> board[to_square] < 0)
         {
             found_move = execute_move_piece(game, player_move);
+            
+            // check for promotion
+            if (found_move && to_rank == 7) {
+                int8_t promotion_piece = get_promotion_choice();
+                game->board[to_square] = promotion_piece; // Positive for white
+                printf("Pawn promoted to %s\n", piece_symbol(game->board[to_square]));
+            }
         }
     }
 
@@ -760,4 +789,46 @@ int move_king(struct GameState *game, struct Chess_move player_move) {
         printf("The move was not legal, try again\n");
     }
     return found_move;
+}
+
+int8_t get_promotion_choice(void) {
+    char choice;
+    int valid_choice = 0;
+    int8_t promotion_piece = QUEEN;
+    
+    while (!valid_choice) {
+        printf("Promote pawn to (q)ueen, (r)ook, (b)ishop, or (k)night [q]: ");
+        scanf(" %c", &choice);
+        
+        // clear input buffer
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF) {}
+        
+        choice = tolower(choice);
+        
+        switch (choice) {
+            case 'q':
+            case '\n': // default choice if just pressed enter
+                promotion_piece = QUEEN;
+                valid_choice = 1;
+                break;
+            case 'r':
+                promotion_piece = ROOK;
+                valid_choice = 1;
+                break;
+            case 'b':
+                promotion_piece = BISHOP;
+                valid_choice = 1;
+                break;
+            case 'k':
+                promotion_piece = KNIGHT;
+                valid_choice = 1;
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+                break;
+        }
+    }
+    
+    return promotion_piece;
 }

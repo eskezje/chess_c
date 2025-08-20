@@ -70,5 +70,6 @@ int find_king(struct GameState *game, int8_t color);
 int is_square_attacked(struct GameState *game, int sq, int8_t by_color);
 
 struct Chess_move notation_to_sqidx(const char *chess_move);
+int8_t get_promotion_choice(void);
 
 #endif
